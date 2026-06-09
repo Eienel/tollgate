@@ -1,0 +1,41 @@
+{
+  "name": "x402-merchant",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tollgate: a production-grade x402 merchant layer for Pharos Atlantic. Turns any AI agent into a reliable paid merchant and a paying buyer, with idempotent verification, verifiable receipts, post-payment sessions, and a bundled facilitator.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "bin": {
+    "x402-merchant": "dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "node --import tsx src/index.ts",
+    "step0": "node --import tsx scripts/check-eip3009.ts",
+    "seller": "node --import tsx examples/seller-server.ts",
+    "buyer": "node --import tsx examples/buyer-client.ts",
+    "dashboard": "node --import tsx dashboard/server.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "@x402/core": "2.14.0",
+    "@x402/evm": "2.14.0",
+    "@x402/express": "2.14.0",
+    "@x402/fetch": "2.14.0",
+    "express": "5.2.1",
+    "viem": "2.52.2",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "tsx": "4.19.2",
+    "typescript": "5.7.3",
+    "@types/express": "5.0.0",
+    "@types/node": "22.10.5"
+  }
+}

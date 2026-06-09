@@ -1,0 +1,390 @@
+/* Tollgate ledger. Paper toll ticket. One accent, held to its meaning. */
+
+:root {
+  --paper: #faf8f4;
+  --surface: #ffffff;
+  --hairline: #e4e0d8;
+  --ink: #1a1a17;
+  --ink-muted: #6b6760;
+  --stamp: #2f6b4f; /* cleared and settled. rare on purpose. */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 40px;
+
+  --radius: 6px;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ui: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+  --spring: cubic-bezier(0.2, 0.9, 0.25, 1.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--ui);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ledger {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+}
+
+/* Masthead carries the running totals. */
+.masthead {
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: var(--space-5);
+}
+
+.masthead-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gate-mark {
+  color: var(--stamp);
+  display: inline-flex;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: var(--space-5) 0 0;
+}
+
+.total dt {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.total dd {
+  margin: 0;
+}
+
+.figure {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  margin-top: var(--space-1);
+}
+
+.total .unit {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* Roll of tickets. */
+.rolls {
+  margin-top: var(--space-5);
+}
+
+.rolls-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin: 0 0 var(--space-3);
+}
+
+.ghost {
+  font-family: var(--ui);
+  font-size: 12px;
+  color: var(--stamp);
+  background: transparent;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.ghost:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 2px;
+}
+
+.tickets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* One ticket. Perforated left edge, monospaced figures, a stamp on the right. */
+.ticket {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-5);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+}
+
+/* The perforation. */
+.ticket::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  bottom: 10px;
+  width: 0;
+  border-left: 1px dashed var(--hairline);
+}
+
+.ticket-main {
+  min-width: 0;
+}
+
+.ticket-resource {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ticket-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin-top: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.ticket-id {
+  color: var(--ink-muted);
+}
+
+.amount {
+  font-family: var(--mono);
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.ticket-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.tx-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  position: relative;
+}
+
+.tx-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -2px;
+  height: 1px;
+  background: var(--ink);
+  transition: right 0.25s var(--spring);
+}
+
+.tx-link:hover::after,
+.tx-link:focus-visible::after {
+  right: 0;
+}
+
+/* The stamp. The signature element. It demonstrates idempotency. */
+.stamp {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  padding: 2px 8px;
+  transform: rotate(-7deg);
+}
+
+.stamp.paid {
+  color: var(--stamp);
+}
+
+.stamp.void {
+  color: var(--ink-muted);
+  text-decoration: line-through;
+}
+
+/* Press animation when a ticket reveals. */
+@keyframes press {
+  0% {
+    transform: rotate(-7deg) scale(2.1);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(-7deg) scale(0.92);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(-7deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ticket.enter {
+  animation: reveal 0.4s var(--spring) both;
+}
+
+.ticket.enter .stamp {
+  animation: press 0.5s var(--spring) both;
+}
+
+/* States. */
+.empty.stub {
+  background: var(--surface);
+  border: 1px dashed var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  position: relative;
+}
+
+.empty .perf {
+  border-top: 1px dashed var(--hairline);
+  margin: 0 auto var(--space-4);
+  width: 60%;
+}
+
+.empty p {
+  margin: var(--space-1) 0;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.muted {
+  color: var(--ink-muted);
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.skel-row {
+  height: 64px;
+  border-radius: var(--radius);
+  border: 1px solid var(--hairline);
+  background: linear-gradient(90deg, var(--surface), var(--paper), var(--surface));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.error {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--ink-muted);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+}
+
+.colophon {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* Calm fallback. No bounce, just a quiet fade. */
+@media (prefers-reduced-motion: reduce) {
+  .ticket.enter,
+  .ticket.enter .stamp,
+  .skel-row {
+    animation: none;
+  }
+  .tx-link::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .totals {
+    gap: var(--space-5);
+  }
+  .figure {
+    font-size: 22px;
+  }
+  .ticket {
+    grid-template-columns: 1fr;
+  }
+  .ticket-side {
+    align-items: flex-start;
+  }
+  .amount {
+    text-align: left;
+  }
+}

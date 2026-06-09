@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tollgate ledger</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="ledger" aria-label="Receipts ledger">
+      <header class="masthead">
+        <div class="masthead-title">
+          <span class="gate-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 20V8l8-4 8 4v12" />
+              <path d="M4 12h16" />
+              <path d="M9 20v-5h6v5" />
+            </svg>
+          </span>
+          <div>
+            <h1>Tollgate</h1>
+            <p class="subtitle">Pay at the gate. Every cleared payment is a stamped ticket.</p>
+          </div>
+        </div>
+
+        <dl class="totals" aria-label="Reconciliation totals">
+          <div class="total">
+            <dt>Total received</dt>
+            <dd class="figure" id="total-received">0.00</dd>
+            <dd class="unit" id="total-unit">USDC</dd>
+          </div>
+          <div class="total">
+            <dt>Tickets cleared</dt>
+            <dd class="figure" id="paid-count">0</dd>
+          </div>
+          <div class="total">
+            <dt>Duplicates voided</dt>
+            <dd class="figure" id="void-count">0</dd>
+          </div>
+        </dl>
+      </header>
+
+      <section class="rolls" aria-live="polite">
+        <div class="rolls-head">
+          <h2>Tickets</h2>
+          <button id="seed" class="ghost" type="button" title="Append a demo PAID then a duplicate VOID">
+            Run demo
+          </button>
+        </div>
+
+        <ol id="tickets" class="tickets" aria-label="Ticket rows"></ol>
+
+        <div id="empty" class="empty stub" hidden>
+          <div class="perf"></div>
+          <p>No tickets yet.</p>
+          <p class="muted">When a payment clears the gate, its stamped ticket prints here.</p>
+        </div>
+
+        <div id="skeleton" class="skeleton" aria-hidden="true">
+          <div class="skel-row"></div>
+          <div class="skel-row"></div>
+          <div class="skel-row"></div>
+        </div>
+
+        <p id="error" class="error" role="alert" hidden></p>
+      </section>
+
+      <footer class="colophon">
+        <span id="status">Reading the ledger.</span>
+      </footer>
+    </main>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>
