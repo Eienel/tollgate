@@ -911,6 +911,17 @@ h2.head,
   .wrap {
     padding: 0 18px;
   }
+  /* Sticky breaks under body overflow-x hidden on mobile browsers; pin the
+     nav for real and pad the page so content starts below it. */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+  body {
+    padding-top: 60px;
+  }
   .nav-links {
     display: none;
   }
