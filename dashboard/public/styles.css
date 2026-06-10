@@ -35,6 +35,7 @@ body {
   font-family: var(--ui);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
 }
 
 .ledger {
@@ -609,22 +610,32 @@ h2 {
 }
 
 .masthead-title,
+.display,
 .lede,
+.specimen,
 .totals,
 .rolls {
   animation: settle 0.7s var(--ease-out) both;
 }
 
+.display {
+  animation-delay: 60ms;
+}
+
 .lede {
-  animation-delay: 90ms;
+  animation-delay: 130ms;
+}
+
+.specimen {
+  animation-delay: 210ms;
 }
 
 .totals {
-  animation-delay: 180ms;
+  animation-delay: 300ms;
 }
 
 .rolls {
-  animation-delay: 270ms;
+  animation-delay: 380ms;
 }
 
 /* Scroll reveal. JS adds .in-view via IntersectionObserver; --index staggers
@@ -688,7 +699,9 @@ h2 {
 
 @media (prefers-reduced-motion: reduce) {
   .masthead-title,
+  .display,
   .lede,
+  .specimen,
   .totals,
   .rolls,
   .figure.bump,
@@ -707,5 +720,305 @@ h2 {
   .ticket:hover,
   .ghost:hover {
     transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Material. The page is paper on a desk: grain in the sheet, ink soaked
+   through from yesterday's stamps, one specimen ticket as the picture, soft
+   layered shadows so things actually sit. All decorative layers are
+   aria-hidden and pointer-transparent.
+--------------------------------------------------------------------------- */
+
+/* Paper grain across the whole sheet. Real texture, barely-there alpha. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.05'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* A faint wash of stamp ink hanging in the air over the masthead. */
+.masthead {
+  position: relative;
+}
+
+.masthead::before {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -160px;
+  width: 560px;
+  height: 560px;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(47, 107, 79, 0.07), rgba(47, 107, 79, 0));
+}
+
+/* Ink soaked through from yesterday's tickets. Always behind the content. */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.masthead > :not(.atmosphere) {
+  position: relative;
+  z-index: 1;
+}
+
+.ghost-stamp {
+  position: absolute;
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  border: 3px solid currentColor;
+  border-radius: 8px;
+  padding: 6px 18px;
+  color: var(--ink);
+  opacity: 0.04;
+}
+
+.gs-1 {
+  font-size: 44px;
+  top: -8px;
+  right: 4%;
+  transform: rotate(8deg);
+  color: var(--stamp);
+  opacity: 0.07;
+}
+
+.gs-2 {
+  font-size: 28px;
+  top: 150px;
+  right: 22%;
+  transform: rotate(-12deg);
+}
+
+.gs-3 {
+  font-size: 30px;
+  top: 320px;
+  right: 6%;
+  transform: rotate(-5deg);
+  opacity: 0.05;
+}
+
+/* The headline. Big, plain, and true. */
+.display {
+  font-size: clamp(34px, 6.5vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  margin: var(--space-6) 0 0;
+  position: relative;
+}
+
+.display-muted {
+  color: var(--ink-muted);
+}
+
+/* The specimen ticket. The product, photographed. */
+.specimen {
+  position: relative;
+  margin: var(--space-5) 0 0;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: stretch;
+  max-width: 560px;
+  transform: rotate(-1deg);
+  box-shadow:
+    0 1px 2px rgba(26, 26, 23, 0.04),
+    0 12px 32px rgba(26, 26, 23, 0.08);
+}
+
+/* Punch holes where the ticket was torn off the roll. */
+.specimen::before,
+.specimen::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  right: 116px;
+}
+
+.specimen::before {
+  top: -10px;
+}
+
+.specimen::after {
+  bottom: -10px;
+}
+
+.spec-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--space-5) var(--space-4) var(--space-5) var(--space-5);
+  min-width: 0;
+}
+
+.spec-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-muted);
+}
+
+.spec-route {
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 700;
+  margin: 2px 0 6px;
+}
+
+.spec-meta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.spec-perf {
+  border-left: 1px dashed var(--hairline);
+  margin: 12px 0;
+}
+
+.spec-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-5) var(--space-5) var(--space-5) var(--space-4);
+}
+
+.spec-no {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+  letter-spacing: 0.08em;
+}
+
+.spec-amount {
+  font-family: var(--mono);
+  font-size: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.spec-unit {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* Ticket stripe code. Texture in service of the object, not decoration. */
+.spec-barcode {
+  margin-top: 10px;
+  width: 84px;
+  height: 16px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 4px,
+    var(--ink) 4px 5px,
+    transparent 5px 9px,
+    var(--ink) 9px 12px,
+    transparent 12px 14px
+  );
+  opacity: 0.75;
+}
+
+/* The big stamp, pressed slightly off the edge like a real inspector would. */
+.spec-stamp {
+  position: absolute;
+  top: -14px;
+  left: 38%;
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--stamp);
+  border: 3px solid currentColor;
+  border-radius: 6px;
+  padding: 4px 14px;
+  transform: rotate(-8deg);
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* Paper sits on the desk: soft layered shadows on every raised surface. */
+.ticket,
+.gap,
+.steps li,
+.data,
+.code {
+  box-shadow:
+    0 1px 2px rgba(26, 26, 23, 0.03),
+    0 6px 18px rgba(26, 26, 23, 0.05);
+}
+
+.ticket:hover {
+  box-shadow:
+    0 2px 3px rgba(26, 26, 23, 0.04),
+    0 12px 28px rgba(26, 26, 23, 0.08);
+}
+
+/* Watermark numerals on the documentation, like page stamps in a ledger. */
+.doc {
+  position: relative;
+}
+
+.doc::after {
+  content: attr(data-no);
+  position: absolute;
+  top: var(--space-4);
+  right: 0;
+  font-family: var(--mono);
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  opacity: 0.045;
+  pointer-events: none;
+}
+
+@media (max-width: 560px) {
+  .specimen {
+    grid-template-columns: 1fr;
+    transform: none;
+  }
+  .spec-perf {
+    border-left: 0;
+    border-top: 1px dashed var(--hairline);
+    margin: 0 16px;
+  }
+  .spec-right {
+    align-items: flex-start;
+  }
+  .specimen::before,
+  .specimen::after {
+    display: none;
+  }
+  .spec-stamp {
+    left: auto;
+    right: 12px;
+    top: -12px;
+    font-size: 17px;
+  }
+  .ghost-stamp {
+    display: none;
+  }
+  .doc::after {
+    font-size: 48px;
   }
 }
