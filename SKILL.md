@@ -26,6 +26,9 @@ same skill also lets an agent pay for resources.
   address and amount validation, retry with backoff, and respect for Atlantic's
   rate and pending-tx limits. The private key is read from env and redacted from
   all logs and errors.
+- Claim binding: the buyer signs tollgate-claim:<txHash> with the paying key, so
+  an observer cannot steal a confirmed tx hash and claim the resource first.
+  Always checked when present; mandatory with TOLLGATE_REQUIRE_CLAIM_SIGNATURE.
 
 ## Tools
 
@@ -33,6 +36,7 @@ Merchant (seller) side:
 - protect_endpoint: build the x402 paymentMiddleware config to gate one route by price.
 - verify_payment: idempotently verify an incoming x402 payment and decide the grant. The differentiator.
 - issue_access_token: mint a short-lived signed session token after a verified payment.
+- verify_access_token: check a presented session token's signature and expiry without touching the chain.
 - get_receipt: fetch one signed receipt and confirm its signature.
 - list_receipts: list receipts with filters plus an earnings reconciliation summary.
 

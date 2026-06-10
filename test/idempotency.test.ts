@@ -62,6 +62,21 @@ test("state survives a restart (reopen rebuilds the index)", async () => {
   }
 });
 
+test("concurrent reserves of the same key yield exactly one fresh", async () => {
+  const { path, cleanup } = tmpFile();
+  try {
+    const store = IdempotencyStore.open(path);
+    const key = IdempotencyStore.keyFor("0xRACE");
+    const results = await Promise.all(
+      Array.from({ length: 25 }, () => store.reserve(key, {})),
+    );
+    const freshCount = results.filter((r) => r.fresh).length;
+    assert.equal(freshCount, 1);
+  } finally {
+    cleanup();
+  }
+});
+
 test("distinct tx hashes do not collide", async () => {
   const { path, cleanup } = tmpFile();
   try {

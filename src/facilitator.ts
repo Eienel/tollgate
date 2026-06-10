@@ -13,6 +13,7 @@ import {
   formatEther,
   getAddress,
   parseEventLogs,
+  recoverMessageAddress,
 } from "viem";
 import {
   publicClient,
@@ -58,7 +59,17 @@ export interface PaymentPayload {
     asset: Address;
     value: string;
     nonce?: string;
+    // Signature by the paying address over claimMessage(txHash). Binds the
+    // claim to the payer so an observer cannot steal a tx hash off the chain
+    // and claim the resource first. Enforced when
+    // TOLLGATE_REQUIRE_CLAIM_SIGNATURE=true; always checked when present.
+    claimSignature?: string;
   };
+}
+
+// The exact bytes a buyer signs to prove the claim is theirs.
+export function claimMessage(txHash: string): string {
+  return `tollgate-claim:${txHash.toLowerCase()}`;
 }
 
 export interface VerifyResponse {
@@ -137,9 +148,41 @@ export class Facilitator {
       for (const log of logs) {
         const args = log.args as { from: Address; to: Address; value: bigint };
         if (getAddress(args.to) === getAddress(req.payTo) && args.value >= required) {
+          const payer = getAddress(args.from);
+
+          // Claim binding. A tx hash is public the moment it confirms, so an
+          // observer could try to claim someone else's payment. When a claim
+          // signature is present it must recover the on-chain payer; when the
+          // merchant requires signatures, a bare tx hash is not enough.
+          const sig = payload.payload.claimSignature;
+          const required_sig =
+            (process.env.TOLLGATE_REQUIRE_CLAIM_SIGNATURE ?? "false")
+              .trim()
+              .toLowerCase() === "true";
+          if (sig) {
+            const recovered = await recoverMessageAddress({
+              message: claimMessage(txHash),
+              signature: sig as `0x${string}`,
+            }).catch(() => undefined);
+            if (!recovered || getAddress(recovered) !== payer) {
+              return {
+                isValid: false,
+                invalidReason: "claim signature does not recover the payer",
+                txHash,
+              };
+            }
+          } else if (required_sig) {
+            return {
+              isValid: false,
+              invalidReason:
+                "this merchant requires a claim signature from the paying address",
+              txHash,
+            };
+          }
+
           return {
             isValid: true,
-            payer: getAddress(args.from),
+            payer,
             txHash,
             settledValue: args.value.toString(),
           };

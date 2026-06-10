@@ -15,7 +15,7 @@ import {
 } from "../chain.js";
 import { TOLLGATE_SCHEME, type PaymentPayload } from "../facilitator.js";
 import { processPayment } from "../grant.js";
-import { issueAccessToken } from "../jwt.js";
+import { issueAccessToken, verifyAccessToken } from "../jwt.js";
 import type { Runtime } from "../runtime.js";
 
 // Cache token decimals so amount math does not hit the RPC every call.
@@ -178,6 +178,30 @@ export function registerMerchantTools(server: McpServer, rt: Runtime): void {
         ttlSeconds: args.ttlSeconds ?? rt.settings.tokenTtlSeconds,
       });
       return ok(issued);
+    },
+  );
+
+  // -------------------------------------------------------------------------
+  // verify_access_token: the other half of sessions. Check a presented token's
+  // signature and expiry without touching the chain.
+  // -------------------------------------------------------------------------
+  server.registerTool(
+    "verify_access_token",
+    {
+      title: "Verify a session token",
+      description:
+        "Check a session token issued by issue_access_token: signature, structure, and expiry. No on-chain calls. Returns the claims (payer, receipt id, tx hash, resource) when valid.",
+      inputSchema: {
+        token: z.string().describe("The session token to verify."),
+      },
+    },
+    async (args) => {
+      const result = verifyAccessToken(args.token);
+      if (result.valid && result.claims?.receiptId) {
+        const receipt = rt.receipts.get(result.claims.receiptId);
+        return ok({ ...result, receiptStatus: receipt?.status ?? "unknown" });
+      }
+      return ok(result);
     },
   );
 

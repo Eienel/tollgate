@@ -155,7 +155,9 @@ function render(data) {
   const receipts = data.receipts ?? [];
   if (receipts.length === 0 && seen.size === 0) {
     els.empty.hidden = false;
-    els.status.textContent = staticMode ? "Static demo. The gate is sleeping." : "Watching the gate.";
+    els.status.textContent = staticMode
+      ? "Demo mode. No live gate attached to this page."
+      : "Watching the gate.";
     firstLoad = false;
     return;
   }
@@ -173,7 +175,7 @@ function render(data) {
   });
 
   els.status.textContent = staticMode
-    ? `${recon.paidCount} cleared, ${recon.voidedCount} voided. Static demo.`
+    ? `${recon.paidCount} cleared, ${recon.voidedCount} voided. Demo mode.`
     : `${recon.paidCount} cleared, ${recon.voidedCount} voided. Live.`;
   firstLoad = false;
 }

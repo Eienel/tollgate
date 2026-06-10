@@ -56,11 +56,14 @@ export class JsonlStore<T extends object> {
     return [...this.index.values()];
   }
 
-  // Serialize writes so concurrent handlers cannot interleave a partial line.
+  // The index is updated synchronously so a check-then-put sequence in one
+  // event-loop turn is atomic: two concurrent reserves of the same key can
+  // never both see it absent. The file append is serialized behind a mutex so
+  // concurrent handlers cannot interleave a partial line.
   put(row: T): Promise<void> {
+    this.index.set(this.keyOf(row), row);
     const run = async () => {
       appendFileSync(this.path, JSON.stringify(row) + "\n");
-      this.index.set(this.keyOf(row), row);
     };
     this.mutex = this.mutex.then(run, run);
     return this.mutex;

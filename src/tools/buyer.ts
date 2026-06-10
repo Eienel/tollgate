@@ -21,7 +21,7 @@ import {
   redact,
   stringifyError,
 } from "../chain.js";
-import { TOLLGATE_SCHEME } from "../facilitator.js";
+import { TOLLGATE_SCHEME, claimMessage } from "../facilitator.js";
 import type { Runtime } from "../runtime.js";
 
 function ok(data: unknown) {
@@ -170,7 +170,11 @@ export function registerBuyerTools(server: McpServer, rt: Runtime): void {
       }
       sessionSpent.set(spentKey, already + atomic);
 
-      // 5. Build the X-PAYMENT header and re-request the resource.
+      // 5. Sign the claim so only this payer can redeem the tx hash, build the
+      // X-PAYMENT header, and re-request the resource.
+      const claimSignature = await account.signMessage({
+        message: claimMessage(txHash),
+      });
       const payment = {
         x402Version: 1,
         scheme: req.scheme,
@@ -181,13 +185,30 @@ export function registerBuyerTools(server: McpServer, rt: Runtime): void {
           to: req.payTo,
           asset: req.asset,
           value: atomic.toString(),
+          claimSignature,
         },
       };
       const header = Buffer.from(JSON.stringify(payment)).toString("base64");
-      const paidResp = await withRetry(
-        () => fetch(args.url, { method, headers: { "X-PAYMENT": header } }),
-        { label: "fetch with payment" },
-      );
+
+      let paidResp: Response;
+      try {
+        paidResp = await withRetry(
+          () => fetch(args.url, { method, headers: { "X-PAYMENT": header } }),
+          { label: "fetch with payment" },
+        );
+      } catch (err) {
+        // The money moved but the claim could not be delivered. Hand the agent
+        // everything it needs to retry the claim without paying again.
+        return ok({
+          paid: true,
+          claimed: false,
+          reason: redact(stringifyError(err)),
+          settlementTxHash: txHash,
+          explorerUrl: `${EXPLORER_URL}/tx/${txHash}`,
+          paymentHeader: header,
+          hint: "Retry the request with this X-PAYMENT header. The payment is settled on-chain and the merchant's idempotency will honor the first claim.",
+        });
+      }
       const resourceText = await paidResp.text();
 
       return ok({

@@ -824,7 +824,12 @@ body::after {
 .specimen {
   position: relative;
   margin: var(--space-5) 0 0;
-  background: var(--surface);
+  /* Punch notches: semicircle bites into the top and bottom edges where the
+     perforation runs, painted into the paper itself. */
+  background:
+    radial-gradient(circle at calc(100% - 125px) 0, var(--paper) 8px, var(--hairline) 8.5px 9.5px, rgba(0, 0, 0, 0) 10px),
+    radial-gradient(circle at calc(100% - 125px) 100%, var(--paper) 8px, var(--hairline) 8.5px 9.5px, rgba(0, 0, 0, 0) 10px),
+    var(--surface);
   border: 1px solid var(--hairline);
   border-radius: 10px;
   display: grid;
@@ -835,27 +840,6 @@ body::after {
   box-shadow:
     0 1px 2px rgba(26, 26, 23, 0.04),
     0 12px 32px rgba(26, 26, 23, 0.08);
-}
-
-/* Punch holes where the ticket was torn off the roll. */
-.specimen::before,
-.specimen::after {
-  content: "";
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--paper);
-  border: 1px solid var(--hairline);
-  right: 116px;
-}
-
-.specimen::before {
-  top: -10px;
-}
-
-.specimen::after {
-  bottom: -10px;
 }
 
 .spec-left {
@@ -1005,9 +989,8 @@ body::after {
   .spec-right {
     align-items: flex-start;
   }
-  .specimen::before,
-  .specimen::after {
-    display: none;
+  .specimen {
+    background: var(--surface);
   }
   .spec-stamp {
     left: auto;

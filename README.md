@@ -104,6 +104,7 @@ the dashboard to seed a PAID and a duplicate VOID and see the same story.
 | `TOLLGATE_SIGNING_SECRET` | HMAC secret for receipts and session tokens | none, required |
 | `TOLLGATE_TOKEN_TTL_SECONDS` | Session token lifetime | `900` |
 | `TOLLGATE_DRY_RUN` | Simulate without broadcasting | `false` |
+| `TOLLGATE_REQUIRE_CLAIM_SIGNATURE` | Require buyers to sign claims with the paying key | `false` |
 | `TOLLGATE_MAX_PER_TX_USDC` | Buyer per-tx spend cap | `5` |
 | `TOLLGATE_MAX_PER_SESSION_USDC` | Buyer per-session spend cap | `25` |
 | `TOLLGATE_TRANSPORT` | `stdio` or `http` | `stdio` |
@@ -119,10 +120,22 @@ Get testnet PHRS for gas from testnet.pharosnetwork.xyz, Stakely, Chainlink, or 
 | `protect_endpoint` | seller | Build the x402 paymentMiddleware config to gate one route by price. |
 | `verify_payment` | seller | Idempotently verify an incoming payment and decide the grant. Never bills twice. |
 | `issue_access_token` | seller | Mint a short-lived signed session token after a verified payment. |
+| `verify_access_token` | seller | Check a presented session token: signature, expiry, claims. No on-chain calls. |
 | `get_receipt` | seller | Fetch one signed receipt and confirm its signature. |
 | `list_receipts` | seller | List receipts with filters plus an earnings reconciliation summary. |
 | `pay_for_resource` | buyer | Pay a 402-gated endpoint per call and return the resource plus a receipt. |
 | `facilitator_status` | infra | Health of the bundled Atlantic facilitator and its account. |
+
+## Claim binding
+
+A settlement tx hash is public the moment it confirms, so a bare tx hash is a
+bearer instrument: whoever presents it first would win the grant. Tollgate
+closes this with claim signatures. The buyer signs `tollgate-claim:<txHash>`
+with the paying key and sends the signature inside the payment payload; the
+facilitator only grants when the signature recovers the on-chain payer.
+`pay_for_resource` signs automatically. Signatures are always verified when
+present, and a merchant can make them mandatory with
+`TOLLGATE_REQUIRE_CLAIM_SIGNATURE=true`.
 
 ## Tests
 

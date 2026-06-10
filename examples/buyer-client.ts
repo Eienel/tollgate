@@ -15,6 +15,7 @@ import {
   assertCanSubmitTx,
   EXPLORER_URL,
 } from "../src/chain.js";
+import { claimMessage } from "../src/facilitator.js";
 
 const URL = process.env.BUYER_URL ?? "http://localhost:4021/report";
 const replay = process.argv.includes("--replay");
@@ -56,7 +57,14 @@ async function main() {
     x402Version: 1,
     scheme: req.scheme,
     network: req.network,
-    payload: { txHash, from: account.address, to: req.payTo, asset: req.asset, value: atomic.toString() },
+    payload: {
+      txHash,
+      from: account.address,
+      to: req.payTo,
+      asset: req.asset,
+      value: atomic.toString(),
+      claimSignature: await account.signMessage({ message: claimMessage(txHash) }),
+    },
   };
   const header = Buffer.from(JSON.stringify(payment)).toString("base64");
 

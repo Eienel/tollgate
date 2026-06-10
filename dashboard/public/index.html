@@ -205,6 +205,7 @@
             <tr><td class="mono">protect_endpoint</td><td>seller</td><td>Build the x402 paymentMiddleware config to gate one route by price.</td></tr>
             <tr><td class="mono">verify_payment</td><td>seller</td><td>Idempotently verify an incoming payment and decide the grant. Never bills twice.</td></tr>
             <tr><td class="mono">issue_access_token</td><td>seller</td><td>Mint a short-lived signed session token after a verified payment.</td></tr>
+            <tr><td class="mono">verify_access_token</td><td>seller</td><td>Check a presented session token: signature, expiry, claims. No on-chain calls.</td></tr>
             <tr><td class="mono">get_receipt</td><td>seller</td><td>Fetch one signed receipt and confirm its signature.</td></tr>
             <tr><td class="mono">list_receipts</td><td>seller</td><td>List receipts with filters plus an earnings reconciliation summary.</td></tr>
             <tr><td class="mono">pay_for_resource</td><td>buyer</td><td>Pay a 402-gated endpoint per call and return the resource plus a receipt.</td></tr>
