@@ -5,6 +5,12 @@ import { Decrypt, Magnetic, Tilt, CountUp, Reveal, CustomCursor, useIsTouch, SPR
 const SITE = "https://tollgate-pharos.vercel.app";
 const REPO = "https://github.com/Eienel/tollgate";
 
+// A real Tollgate payment settled on Pharos Atlantic. Set once a funded run
+// produces a hash; the proof panel verifies it live against the public RPC.
+const PROOF_TX = "";
+const ATLANTIC_RPC = "https://atlantic.dplabs-internal.com";
+const PHAROSSCAN = "https://atlantic.pharosscan.xyz";
+
 // On-theme photos from Unsplash, treated as ink-and-paper duotone in CSS.
 const IMG = {
   press: "https://images.unsplash.com/photo-1581508512961-0e3b9524db40?w=1600&q=70&auto=format&fit=crop",
@@ -403,6 +409,8 @@ function Demo() {
             </div>
           </div>
 
+          <ProofPanel />
+
           <p className="demo-note">
             This shows one of the four gaps Tollgate closes. The full skill is{" "}
             <a href="#tools">eight tools across both sides</a>: selling, paying,
@@ -411,6 +419,64 @@ function Demo() {
         </div>
       </div>
     </section>
+  );
+}
+
+// Verifies a real Tollgate payment live against the Atlantic RPC, in the
+// visitor's browser. No wallet, no signing: a read-only confirmation that the
+// settlement is real, plus a link to the explorer.
+function ProofPanel() {
+  const [state, setState] = useState({ status: "idle" });
+  if (!PROOF_TX) return null;
+
+  async function verify() {
+    setState({ status: "checking" });
+    try {
+      const res = await fetch(ATLANTIC_RPC, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "eth_getTransactionReceipt",
+          params: [PROOF_TX],
+        }),
+      });
+      const json = await res.json();
+      const r = json.result;
+      if (!r) {
+        setState({ status: "notfound" });
+        return;
+      }
+      setState({
+        status: r.status === "0x1" ? "confirmed" : "reverted",
+        block: parseInt(r.blockNumber, 16),
+      });
+    } catch {
+      setState({ status: "error" });
+    }
+  }
+
+  const short = `${PROOF_TX.slice(0, 10)}...${PROOF_TX.slice(-8)}`;
+  return (
+    <div className="proof">
+      <div className="proof-label">Real settlement on Atlantic</div>
+      <div className="proof-row">
+        <code className="proof-hash">{short}</code>
+        <button className="btn btn-outline proof-btn" onClick={verify} disabled={state.status === "checking"}>
+          {state.status === "checking" ? "Checking..." : "Verify on-chain"}
+        </button>
+        <a className="proof-link" href={`${PHAROSSCAN}/tx/${PROOF_TX}`} target="_blank" rel="noreferrer">
+          PharosScan
+        </a>
+      </div>
+      {state.status === "confirmed" && (
+        <div className="proof-result ok">Confirmed in block {state.block.toLocaleString()}. This is a live on-chain payment, not the simulation above.</div>
+      )}
+      {state.status === "reverted" && <div className="proof-result bad">Transaction reverted.</div>}
+      {state.status === "notfound" && <div className="proof-result bad">Not found on this RPC yet.</div>}
+      {state.status === "error" && <div className="proof-result bad">RPC unreachable. Open PharosScan instead.</div>}
+    </div>
   );
 }
 

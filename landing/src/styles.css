@@ -615,6 +615,54 @@ h2.head {
   max-width: 44ch;
 }
 
+.proof {
+  margin-top: 36px;
+  padding-top: 22px;
+  border-top: 1px solid #2c2a22;
+}
+.proof-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6fd39f;
+  margin-bottom: 12px;
+}
+.proof-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.proof-hash {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #cfcabd;
+}
+.proof-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+.proof-link {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #6fd39f;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.proof-result {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+.proof-result.ok {
+  color: #6fd39f;
+}
+.proof-result.bad {
+  color: #ef8d80;
+}
+
 .btn-dark {
   background: var(--paper);
   color: var(--ink);
