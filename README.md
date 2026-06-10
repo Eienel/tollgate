@@ -1,38 +1,22 @@
 # Tollgate (x402-merchant)
 
-Tollgate turns any AI agent into a reliable paid merchant on Pharos, and lets an
-agent pay for resources, using x402. Agents are becoming on-chain economic actors.
-An agent that sells a service needs to take payment without ever billing the same
-transaction twice, hand out a session credential, keep verifiable receipts, and
-reconcile what it earned. An agent that buys a service needs to pay per call within
-a budget. Tollgate is the production layer that makes both sides dependable on
-Pharos Atlantic, and it ships the facilitator Pharos does not host for you.
+**Tollgate closes four gaps in Pharos's x402 spec that the docs acknowledge but
+leave for developers to solve.** The official example gets you a demo; the gaps
+are what stand between that demo and a service you can actually charge for.
 
-This is a TypeScript MCP server. Default transport is stdio; an HTTP transport is
-optional. The headline feature is idempotency: a payment can never grant access or
-be billed twice, and that guarantee survives a restart. It runs on both Pharos
-networks: Atlantic testnet (688689) by default, or Pacific mainnet (1672) by
-setting `TOLLGATE_NETWORK=mainnet`.
+| # | Pharos documents the gap | Tollgate's answer |
+| --- | --- | --- |
+| 1 | **No hosted facilitator.** "The component could become a SPOF; we recommend redundant deployment and multi-account strategies." | Bundles a preconfigured facilitator for Atlantic and Pacific with retry, idempotent settle, and a `facilitator_status` health probe. |
+| 2 | **Idempotency, on you.** "The server must implement idempotency logic to ensure the same tx is not billed twice." | Makes it first class: a persistent, restart-surviving dedupe store keyed by tx hash. A payment can never bill or grant twice. |
+| 3 | **Sessions, on you.** "We recommend issuing a short-lived JWT after payment." | Ships `issue_access_token`: a signed, short-lived session bound to the receipt, so the buyer does not re-verify on-chain every request. |
+| 4 | **Network and token confusion.** Two testnets, an internal-looking RPC, a test USDC flagged as not official. | Defines the chain once, pins the verified RPC and token, and confirms the token's real capabilities in STEP 0 below. |
 
-## Why this exists
-
-The official Pharos x402 example gets you a demo. Shipping a real paid service runs
-into a cluster of gaps that Pharos documents but does not solve for you. Tollgate
-closes the four of them:
-
-1. No hosted facilitator for Pharos. You must run your own verify and settle
-   service, and the docs warn it is a single point of failure needing retry and
-   health checks. Tollgate bundles a preconfigured facilitator for Atlantic with
-   retry, idempotent settle, and a `facilitator_status` health probe.
-2. Idempotency is left to the developer. The docs state the server must ensure the
-   same on-chain tx is not billed or granted twice. Tollgate makes this first
-   class: a persistent, restart-surviving dedupe store keyed by tx hash.
-3. Post-payment sessions are left to the developer. The docs recommend a
-   short-lived token after payment to avoid re-verifying on-chain every request.
-   Tollgate mints a signed session token with `issue_access_token`.
-4. Network and token confusion. Two testnets, internal-looking RPC, and a test
-   USDC flagged as not official. Tollgate defines Atlantic (688689) once, pins the
-   verified RPC and token, and confirms the token's capabilities in STEP 0.
+Underneath the four answers, Tollgate is a two-sided TypeScript MCP server: an
+agent can sell a service (take payment, issue a session, keep verifiable
+receipts, reconcile earnings) and an agent can buy one (pay per call within a
+budget). Default transport is stdio; HTTP is optional. It runs on both Pharos
+networks: Atlantic testnet (688689) by default, or Pacific mainnet (1672) via
+`TOLLGATE_NETWORK=mainnet`.
 
 ## STEP 0: the test USDC has no EIP-3009
 
