@@ -20,6 +20,7 @@
   --ui: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 
   --spring: cubic-bezier(0.2, 0.9, 0.25, 1.2);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -129,8 +130,35 @@ h2 {
   background: transparent;
   border: 1px solid var(--hairline);
   border-radius: var(--radius);
-  padding: 6px 10px;
+  padding: 8px 14px;
   cursor: pointer;
+  transition:
+    transform 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out),
+    background-color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out);
+  will-change: transform;
+}
+
+.ghost:hover {
+  border-color: var(--stamp);
+  background: #f3f7f4;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 0 0 var(--hairline);
+}
+
+/* The physical push. The button sinks under the finger. */
+.ghost:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: none;
+  transition-duration: 0.08s;
+}
+
+.ghost:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 .ghost:focus-visible {
@@ -158,6 +186,17 @@ h2 {
   grid-template-columns: 1fr auto;
   gap: var(--space-2) var(--space-4);
   align-items: center;
+  transition:
+    transform 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out);
+}
+
+/* A ticket lifts off the stack slightly under the hand. */
+.ticket:hover {
+  transform: translateY(-2px);
+  border-color: #d4cfc4;
+  box-shadow: 0 3px 0 0 var(--hairline);
 }
 
 /* The perforation. */
@@ -549,4 +588,124 @@ h2 {
   justify-content: space-between;
   gap: var(--space-4);
   flex-wrap: wrap;
+}
+
+/* ---------------------------------------------------------------------------
+   Life. Motion is motivated: load-in tells the story top to bottom, scroll
+   reveals sequence the documentation, the thud sells the stamp, the count-up
+   acknowledges money arriving. All of it collapses under reduced motion.
+--------------------------------------------------------------------------- */
+
+/* The page settles in like a ledger being opened. */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.masthead-title,
+.lede,
+.totals,
+.rolls {
+  animation: settle 0.7s var(--ease-out) both;
+}
+
+.lede {
+  animation-delay: 90ms;
+}
+
+.totals {
+  animation-delay: 180ms;
+}
+
+.rolls {
+  animation-delay: 270ms;
+}
+
+/* Scroll reveal. JS adds .in-view via IntersectionObserver; --index staggers
+   children inside a revealed group. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s var(--ease-out),
+    transform 0.6s var(--ease-out);
+  transition-delay: calc(var(--index, 0) * 70ms);
+  will-change: transform, opacity;
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The thud. When the stamp presses, the whole ticket takes the hit. */
+@keyframes thud {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(0.985);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ticket.enter {
+  animation:
+    reveal 0.4s var(--spring) both,
+    thud 0.35s var(--ease-out) 0.28s;
+}
+
+/* The totals tick when money lands. */
+@keyframes tick-bump {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.figure.bump {
+  animation: tick-bump 0.45s var(--spring);
+}
+
+/* The demo button is magnetic within a small radius. JS drives only transform;
+   this just promises the GPU. */
+#seed {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masthead-title,
+  .lede,
+  .totals,
+  .rolls,
+  .figure.bump,
+  .ticket.enter {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .ticket,
+  .ghost {
+    transition: none;
+  }
+  .ticket:hover,
+  .ghost:hover {
+    transform: none;
+  }
 }

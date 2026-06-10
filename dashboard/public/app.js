@@ -110,12 +110,44 @@ function reconcileLocal(receipts) {
   };
 }
 
+// Count a figure up to its new value, then give it a small bump. Feedback for
+// money arriving. Falls back to a plain swap under reduced motion.
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+function setFigure(el, next, format) {
+  const target = Number(next);
+  const prev = Number((el.dataset.value ?? el.textContent).replace(/,/g, "")) || 0;
+  el.dataset.value = String(target);
+  if (reducedMotion.matches || !Number.isFinite(target) || target === prev) {
+    el.textContent = format(target);
+    return;
+  }
+  const start = performance.now();
+  const dur = 600;
+  function frame(now) {
+    const t = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = format(prev + (target - prev) * eased);
+    if (t < 1) requestAnimationFrame(frame);
+    else {
+      el.classList.remove("bump");
+      void el.offsetWidth;
+      el.classList.add("bump");
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+const fmtMoney = (v) =>
+  v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtCount = (v) => String(Math.round(v));
+
 function render(data) {
   explorer = data.explorer || explorer;
   const recon = data.reconciliation;
-  els.totalReceived.textContent = recon.totalReceivedFormatted ?? "0.00";
-  els.paidCount.textContent = String(recon.paidCount ?? 0);
-  els.voidCount.textContent = String(recon.voidedCount ?? 0);
+  setFigure(els.totalReceived, Number(String(recon.totalReceivedFormatted ?? "0").replace(/,/g, "")), fmtMoney);
+  setFigure(els.paidCount, recon.paidCount ?? 0, fmtCount);
+  setFigure(els.voidCount, recon.voidedCount ?? 0, fmtCount);
 
   els.skeleton.hidden = true;
   els.error.hidden = true;
@@ -235,3 +267,98 @@ els.seed?.addEventListener("click", async () => {
 tick().then(() => {
   if (!staticMode) pollTimer = setInterval(tick, 1500);
 });
+
+// ---------------------------------------------------------------------------
+// Life. Scroll reveals sequence the documentation; the demo button leans
+// toward the hand. Reveals use IntersectionObserver, never a scroll listener.
+// The magnetic effect drives transform only, outside any layout work, and
+// both collapse under reduced motion.
+// ---------------------------------------------------------------------------
+
+function setupReveals() {
+  const sections = document.querySelectorAll(".doc");
+  if (!("IntersectionObserver" in window) || reducedMotion.matches) return;
+
+  for (const section of sections) {
+    section.classList.add("reveal");
+    // Stagger the grouped children inside a section: gap cards and steps.
+    const children = section.querySelectorAll(".gap, .steps li");
+    children.forEach((child, i) => {
+      child.classList.add("reveal");
+      child.style.setProperty("--index", String(i + 1));
+    });
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("in-view");
+        for (const child of entry.target.querySelectorAll(".reveal")) {
+          child.classList.add("in-view");
+        }
+        io.unobserve(entry.target);
+      }
+    },
+    { rootMargin: "0px 0px -60px 0px", threshold: 0.1 },
+  );
+  for (const section of sections) io.observe(section);
+}
+
+function setupMagnetic(button) {
+  if (!button || reducedMotion.matches) return;
+  const RADIUS = 80;
+  const PULL = 0.22;
+  let raf = 0;
+  let tx = 0;
+  let ty = 0;
+  let pressed = false;
+
+  function apply() {
+    raf = 0;
+    const press = pressed ? " scale(0.96)" : "";
+    button.style.transform = tx || ty || pressed ? `translate(${tx}px, ${ty}px)${press}` : "";
+  }
+
+  function onMove(e) {
+    const r = button.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const dx = e.clientX - cx;
+    const dy = e.clientY - cy;
+    const dist = Math.hypot(dx, dy);
+    if (dist < RADIUS) {
+      tx = dx * PULL;
+      ty = dy * PULL;
+    } else {
+      tx = 0;
+      ty = 0;
+    }
+    if (!raf) raf = requestAnimationFrame(apply);
+  }
+
+  function onLeave() {
+    tx = 0;
+    ty = 0;
+    if (!raf) raf = requestAnimationFrame(apply);
+  }
+
+  // Listen on the ledger column only, not the whole window.
+  const zone = button.closest(".rolls") ?? button.parentElement;
+  zone.addEventListener("pointermove", onMove);
+  zone.addEventListener("pointerleave", onLeave);
+  button.addEventListener("pointerdown", () => {
+    pressed = true;
+    if (!raf) raf = requestAnimationFrame(apply);
+  });
+  for (const ev of ["pointerup", "pointercancel"]) {
+    window.addEventListener(ev, () => {
+      if (!pressed) return;
+      pressed = false;
+      if (!raf) raf = requestAnimationFrame(apply);
+    });
+  }
+}
+
+setupReveals();
+setupMagnetic(els.seed);
