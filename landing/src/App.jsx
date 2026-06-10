@@ -396,6 +396,12 @@ function Demo() {
               </div>
             </div>
           </div>
+
+          <p className="demo-note">
+            This shows one of the four gaps Tollgate closes. The full skill is{" "}
+            <a href="#tools">eight tools across both sides</a>: selling, paying,
+            sessions, receipts, and the bundled facilitator.
+          </p>
         </div>
       </div>
     </section>
