@@ -388,3 +388,165 @@ h2 {
     text-align: left;
   }
 }
+
+/* Documentation sections beneath the live ledger. Same tokens, same voice. */
+
+.lede {
+  margin: var(--space-4) 0 0;
+  max-width: 58ch;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.ledger-note {
+  font-family: var(--mono);
+  font-size: 12px;
+  margin: var(--space-3) 0 0;
+}
+
+.doc {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--hairline);
+}
+
+.doc h2 {
+  margin-bottom: var(--space-4);
+}
+
+.doc h3 {
+  font-size: 14px;
+  margin: 0 0 var(--space-1);
+}
+
+.doc p {
+  max-width: 64ch;
+  font-size: 14px;
+  margin: var(--space-2) 0;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 0.95em;
+}
+
+/* The three-step gate walkthrough. */
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.steps li {
+  display: flex;
+  gap: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+.step-no {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--stamp);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  align-self: flex-start;
+  padding: 2px 8px;
+}
+
+.steps p {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+/* The four documented gaps. */
+.gaps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.gap {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+
+.gap p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* Data tables: hairlines, mono figures. */
+.data {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  font-size: 13px;
+  margin: var(--space-3) 0;
+}
+
+.data th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.data th,
+.data td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--hairline);
+  vertical-align: top;
+}
+
+.data tr:last-child td {
+  border-bottom: 0;
+}
+
+.data td.mono,
+.data td .mono {
+  word-break: break-all;
+}
+
+/* Code blocks read like the back of a ticket. */
+.code {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  margin: var(--space-3) 0;
+}
+
+.plain-list {
+  margin: var(--space-2) 0 0;
+  padding-left: 1.1em;
+  max-width: 68ch;
+  font-size: 14px;
+}
+
+.plain-list li {
+  margin-bottom: var(--space-2);
+}
+
+.colophon {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
