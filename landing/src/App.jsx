@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { Decrypt, Magnetic, Tilt, CountUp, Reveal, CustomCursor, useIsTouch, SPRING } from "./bits.jsx";
+import FlightTicket from "./FlightTicket.jsx";
 
 const SITE = "https://tollgate-pharos.vercel.app";
 const REPO = "https://github.com/Eienel/tollgate";
@@ -54,72 +55,6 @@ function GateMark() {
       <path d="M4 12h16" />
       <path d="M9 20v-5h6v5" />
     </svg>
-  );
-}
-
-function HeroTicket() {
-  const { scrollY } = useScroll();
-  const yScroll = useTransform(scrollY, [0, 600], [0, -60]);
-  const touch = useIsTouch();
-  const stageRef = useRef(null);
-
-  // The ticket leans toward the pointer as it crosses the stage, and can be
-  // grabbed and flung; it springs back to true.
-  const rx = useSpring(useMotionValue(0), { stiffness: 120, damping: 14 });
-  const ry = useSpring(useMotionValue(0), { stiffness: 120, damping: 14 });
-  function move(e) {
-    if (touch || !stageRef.current) return;
-    const r = stageRef.current.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    ry.set(px * 22);
-    rx.set(-py * 18);
-  }
-  function leave() {
-    rx.set(0);
-    ry.set(0);
-  }
-
-  return (
-    <div className="ticket-stage" ref={stageRef} onPointerMove={move} onPointerLeave={leave}>
-      <motion.div
-        className="big-ticket"
-        style={{ y: yScroll, rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-        initial={{ opacity: 0, y: 30, rotateX: 12 }}
-        animate={{ opacity: 1, y: 0, rotateX: 0 }}
-        transition={{ ...SPRING, delay: 0.15 }}
-        drag={!touch}
-        dragSnapToOrigin
-        dragElastic={0.18}
-        dragConstraints={{ left: -60, right: 60, top: -40, bottom: 40 }}
-        whileDrag={{ cursor: "grabbing", scale: 1.03 }}
-      >
-        <span className="bt-perf l" />
-        <span className="bt-perf r" />
-        <div className="bt-top">
-          <span className="bt-label">Toll ticket</span>
-          <span className="bt-no">No. 000482</span>
-        </div>
-        <div className="bt-route">GET /report</div>
-        <div className="bt-meta">eip155:688689 &middot; payer 0x7c41&hellip;9e2d</div>
-        <div className="bt-amount">
-          <span className="v">0.10</span>
-          <span className="u">USDC</span>
-        </div>
-        <div className="barcode" />
-        <motion.span
-          className="stamp paid"
-          initial={{ scale: 2.6, opacity: 0, rotate: 4 }}
-          animate={{ scale: 1, opacity: 1, rotate: -12 }}
-          transition={{ type: "spring", stiffness: 220, damping: 12, delay: 0.7 }}
-        >
-          Paid
-        </motion.span>
-      </motion.div>
-      <div className="hero-photo" aria-hidden="true">
-        <img src={IMG.booth} alt="" loading="lazy" />
-      </div>
-    </div>
   );
 }
 
@@ -183,7 +118,7 @@ function Hero() {
               </Reveal>
             </div>
           </div>
-          <HeroTicket />
+          <FlightTicket />
         </div>
       </div>
     </section>
@@ -350,7 +285,7 @@ function Demo() {
                   <button className="btn btn-dark" onClick={pay}>Process payment</button>
                 </Magnetic>
                 <Magnetic strength={0.3}>
-                  <button className="btn btn-outline" onClick={replay} disabled={!tx} style={{ opacity: tx ? 1 : 0.5 }}>
+                  <button className="btn btn-outline" onClick={replay} disabled={!tx}>
                     Replay same tx
                   </button>
                 </Magnetic>

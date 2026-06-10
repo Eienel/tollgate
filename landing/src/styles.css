@@ -585,9 +585,13 @@ h2.head {
 
 .btn-outline {
   background: transparent;
-  color: var(--paper);
-  border-color: #44413740;
-  border-color: #4a463c;
+  color: #e9e5da;
+  border-color: #5c574b;
+}
+.btn-outline:disabled {
+  cursor: default;
+  color: #9a958a;
+  border-color: #3a3730;
 }
 
 .counter-row {
@@ -814,27 +818,25 @@ h2.head,
   border-bottom: 1px solid var(--hairline);
   background: var(--ink);
 }
+/* The photo is buried under smoke: just a ghost of the press behind the ink. */
 .band img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Lighter so the detail reads, but low opacity so the ink dominates and the
-     dark shows through. The band stays dark with the photo as fine texture. */
-  filter: grayscale(1) contrast(1.12) brightness(0.85);
-  opacity: 0.3;
+  filter: grayscale(1) contrast(1.1) brightness(0.8) blur(1px);
+  opacity: 0.13;
 }
-/* A vignette into the ink at the edges, plus a faint green tint, so the photo
-   sits inside the dark rather than on top of it. */
+/* A heavy haze: dark almost everywhere, with a faint clearing at center so a
+   hint of machinery shows through like smoke. */
 .band::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(120% 90% at 50% 50%, transparent 40%, var(--ink) 100%),
-    color-mix(in srgb, var(--stamp) 12%, transparent);
-  mix-blend-mode: multiply;
+    radial-gradient(120% 95% at 50% 45%, rgba(22, 21, 15, 0.45) 0%, rgba(22, 21, 15, 0.92) 80%),
+    color-mix(in srgb, var(--stamp) 10%, transparent);
 }
 .band-text {
   position: relative;
@@ -963,4 +965,47 @@ h2.head,
 .hero .wrap {
   position: relative;
   z-index: 1;
+}
+
+/* ---------------------------------------------------------------------------
+   Flight ticket: the morphing hero loop. Paper shape, ink outline, green gate.
+--------------------------------------------------------------------------- */
+.flight-stage {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.flight-svg {
+  width: 100%;
+  max-width: 480px;
+  overflow: visible;
+}
+.flight-shape {
+  fill: var(--surface);
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 12px 18px rgba(22, 21, 15, 0.16));
+}
+.flight-gate path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.flight-gate-hot {
+  stroke: var(--stamp) !important;
+  stroke-width: 3.4 !important;
+}
+.flight-trail {
+  fill: none;
+  stroke: var(--stamp);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+@media (max-width: 720px) {
+  .flight-svg {
+    max-width: 360px;
+  }
 }
