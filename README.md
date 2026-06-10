@@ -6,10 +6,10 @@ are what stand between that demo and a service you can actually charge for.
 
 | # | Pharos documents the gap | Tollgate's answer |
 | --- | --- | --- |
-| 1 | **No hosted facilitator.** [Pharos docs](https://docs.pharos.xyz/developer-guide/x402#development-recommendations): the facilitator "could become a performance bottleneck or a single point of failure; it is recommended to combine redundant deployment, health checks, multi-account strategies, and downgrade policies." | Bundles a preconfigured facilitator for Atlantic and Pacific with retry, idempotent settle, and a `facilitator_status` health probe. |
-| 2 | **Idempotency, on you.** [Pharos docs](https://docs.pharos.xyz/developer-guide/x402#development-recommendations): "The server must implement idempotency processing logic to ensure that the same on-chain transaction is not billed multiple times or granted permissions repeatedly." | Makes it first class: a persistent, restart-surviving dedupe store keyed by tx hash. A payment can never bill or grant twice. |
-| 3 | **Sessions, on you.** [Pharos docs](https://docs.pharos.xyz/developer-guide/x402#development-recommendations): "the server can issue a short-term valid JSON Web Token (JWT) as a credential for subsequent resource access." | Ships `issue_access_token`: a signed, short-lived session bound to the receipt, so the buyer does not re-verify on-chain every request. |
-| 4 | **Network and token confusion.** [Pharos docs](https://docs.pharos.xyz/developer-guide/x402#skill): the skill "only supports the Pharos Atlantic testnet with chain ID 688689 and a test USDC token address (...), which is not an official address." | Defines the chain once, pins the verified RPC and token, and confirms the token's real capabilities in STEP 0 below. |
+| 1 | **No hosted facilitator.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations) warns it "could become a single point of failure." | A bundled facilitator for both networks, with retry and a `facilitator_status` probe. |
+| 2 | **Idempotency, on you.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations): "the same on-chain transaction is not billed multiple times." | A restart-surviving dedupe keyed by tx hash. Never bills or grants twice. |
+| 3 | **Sessions, on you.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations) recommends "a short-term valid JSON Web Token (JWT)." | `issue_access_token` mints a signed session bound to the receipt. |
+| 4 | **Network confusion.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#skill) flags a test USDC "which is not an official address." | Pins the chain, RPC, and token, and verifies the token in STEP 0 below. |
 
 Underneath the four answers, Tollgate is a two-sided TypeScript MCP server: an
 agent can sell a service (take payment, issue a session, keep verifiable
