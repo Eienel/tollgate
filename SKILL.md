@@ -50,7 +50,7 @@ Merchant (seller) side:
 - list_receipts: list receipts with filters plus an earnings reconciliation summary.
 
 Buyer side:
-- pay_for_resource: pay a 402-gated endpoint per call and return the resource plus a receipt with the settlement tx hash.
+- pay_for_resource: pay a 402-gated endpoint per call and return the resource plus a receipt with the settlement tx hash. Custodial by default (reads TOLLGATE_PRIVATE_KEY); pass prepareOnly with fromAddress for non-custodial use, returning an unsigned transfer for an external wallet to sign so no key is handed to Tollgate.
 
 Infra:
 - facilitator_status: health of the bundled Atlantic facilitator and its account.

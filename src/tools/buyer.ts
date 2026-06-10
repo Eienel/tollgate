@@ -5,9 +5,10 @@
 
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { parseUnits, formatUnits, getAddress, type Address, type Hash } from "viem";
+import { parseUnits, formatUnits, getAddress, encodeFunctionData, type Address, type Hash } from "viem";
 import {
   NETWORK,
+  CHAIN_ID,
   EXPLORER_URL,
   erc20Abi,
   publicClient,
@@ -68,12 +69,14 @@ export function registerBuyerTools(server: McpServer, rt: Runtime): void {
     {
       title: "Pay for a 402-gated resource",
       description:
-        "Fetch a resource that returns HTTP 402 on Pharos Atlantic, pay the required amount in USDC, then return the resource and a receipt with the settlement tx hash. Enforces per-tx and per-session spend caps. Set dryRun to simulate without broadcasting.",
+        "Fetch a resource that returns HTTP 402 on Pharos Atlantic, pay the required amount in USDC, then return the resource and a receipt with the settlement tx hash. Enforces per-tx and per-session spend caps. Set dryRun to simulate without broadcasting. Set prepareOnly with fromAddress for non-custodial use: no private key is loaded, and the unsigned transfer is returned for an external wallet (a browser wallet, a human in the loop) to sign and broadcast.",
       inputSchema: {
         url: z.string().describe("The 402-gated resource URL."),
         method: z.string().optional().describe("HTTP method. Default GET."),
         maxUsdc: z.string().optional().describe("Reject if the price exceeds this many USDC. Overrides the per-tx cap downward only."),
         dryRun: z.boolean().optional().describe("Simulate the payment without broadcasting."),
+        prepareOnly: z.boolean().optional().describe("Non-custodial: build the unsigned transfer for an external wallet to sign, instead of broadcasting with a server-held key. Requires fromAddress. No private key is loaded."),
+        fromAddress: z.string().optional().describe("The payer's wallet address. Required with prepareOnly so the unsigned transaction can be built."),
       },
     },
     async (args) => {
@@ -117,9 +120,53 @@ export function registerBuyerTools(server: McpServer, rt: Runtime): void {
         });
       }
 
+      // 3. Non-custodial mode: build the unsigned transfer for an external
+      // wallet to sign. No private key is loaded or needed. The caller supplies
+      // the payer's address; their wallet signs, broadcasts, then assembles the
+      // X-PAYMENT header. This is how a browser wallet or human-in-the-loop
+      // client pays without ever handing Tollgate a key.
+      if (args.prepareOnly) {
+        if (!args.fromAddress) {
+          return ok({
+            paid: false,
+            reason: "prepareOnly requires fromAddress, the payer's wallet address, so the unsigned transaction can be built.",
+          });
+        }
+        const from = assertAddress(args.fromAddress);
+        const data = encodeFunctionData({
+          abi: erc20Abi,
+          functionName: "transfer",
+          args: [req.payTo, atomic],
+        });
+        return ok({
+          paid: false,
+          prepareOnly: true,
+          unsignedTransaction: {
+            from,
+            to: req.asset,
+            data,
+            value: "0x0",
+            chainId: CHAIN_ID,
+          },
+          requirement: {
+            asset: req.asset,
+            amountUsdc: formatUnits(atomic, decimals),
+            payTo: req.payTo,
+            scheme: req.scheme,
+            network: req.network,
+          },
+          claim: {
+            messageTemplate: claimMessage("<txHash>"),
+            note: "After the wallet broadcasts the transfer, sign the claim message for the resulting txHash with the same wallet, so only the payer can redeem the payment.",
+          },
+          next:
+            "Sign and broadcast unsignedTransaction in the user's wallet. Then sign the claim message for the resulting txHash, base64-encode an X-PAYMENT payload { x402Version: 1, scheme, network, payload: { txHash, from, to, asset, value, claimSignature } }, and re-request the resource with that X-PAYMENT header. The merchant's verify_payment is idempotent, so a claim can be retried safely without paying twice.",
+        });
+      }
+
       const account = loadAccount();
 
-      // 3. Dry-run: simulate, do not broadcast.
+      // 4. Dry-run: simulate, do not broadcast.
       if (dryRun) {
         const { request } = await publicClient().simulateContract({
           account,
@@ -143,7 +190,7 @@ export function registerBuyerTools(server: McpServer, rt: Runtime): void {
         });
       }
 
-      // 4. Broadcast the ERC-20 transfer (buyer pays gas; token is not EIP-3009).
+      // 5. Broadcast the ERC-20 transfer (buyer pays gas; token is not EIP-3009).
       await assertCanSubmitTx(account.address);
       rateBudget.take();
       const wallet = walletClient();
@@ -170,7 +217,7 @@ export function registerBuyerTools(server: McpServer, rt: Runtime): void {
       }
       sessionSpent.set(spentKey, already + atomic);
 
-      // 5. Sign the claim so only this payer can redeem the tx hash, build the
+      // 6. Sign the claim so only this payer can redeem the tx hash, build the
       // X-PAYMENT header, and re-request the resource.
       const claimSignature = await account.signMessage({
         message: claimMessage(txHash),

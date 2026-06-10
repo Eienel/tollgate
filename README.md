@@ -151,7 +151,7 @@ Get testnet PHRS for gas from testnet.pharosnetwork.xyz, Stakely, Chainlink, or 
 | `verify_access_token` | seller | Check a presented session token: signature, expiry, claims. No on-chain calls. |
 | `get_receipt` | seller | Fetch one signed receipt and confirm its signature. |
 | `list_receipts` | seller | List receipts with filters plus an earnings reconciliation summary. |
-| `pay_for_resource` | buyer | Pay a 402-gated endpoint per call and return the resource plus a receipt. |
+| `pay_for_resource` | buyer | Pay a 402-gated endpoint per call and return the resource plus a receipt. Custodial by default; `prepareOnly` returns an unsigned tx for non-custodial signing. |
 | `facilitator_status` | infra | Health of the bundled Atlantic facilitator and its account. |
 
 ## Claim binding
@@ -164,6 +164,24 @@ facilitator only grants when the signature recovers the on-chain payer.
 `pay_for_resource` signs automatically. Signatures are always verified when
 present, and a merchant can make them mandatory with
 `TOLLGATE_REQUIRE_CLAIM_SIGNATURE=true`.
+
+## Wallets: custodial agent, or non-custodial signing
+
+Tollgate supports both wallet models, so the same skill serves an autonomous
+agent and a human-in-the-loop client.
+
+- **Agent-held key (default).** `pay_for_resource` reads `TOLLGATE_PRIVATE_KEY`
+  from the environment (never hardcoded, redacted from every log and error),
+  broadcasts the payment itself, and stays inside the per-tx and per-session
+  spend caps. This is the right model for agent-to-agent commerce, where no
+  human is present to approve a transaction.
+- **Non-custodial (no key).** Call `pay_for_resource({ url, prepareOnly: true,
+  fromAddress })` and Tollgate loads no key at all. It returns the unsigned
+  ERC-20 transfer for an external wallet to sign and broadcast, plus the claim
+  message to sign for the resulting tx hash and instructions to assemble the
+  `X-PAYMENT` header. This is how a browser wallet (Rabby, MetaMask) or a person
+  pays without ever handing Tollgate a private key, and it is what makes a
+  public, real-transaction demo safe: every signer spends only their own funds.
 
 ## Build on Tollgate
 

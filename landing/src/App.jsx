@@ -316,7 +316,9 @@ function Demo() {
         <div className="demo">
           <div className="section-head">
             <div>
-              <div className="kicker" style={{ color: "#6fd39f" }}>The signature element</div>
+              <div className="kicker" style={{ color: "#6fd39f" }}>
+                The signature element <span className="sim-tag">Simulated</span>
+              </div>
               <h2 className="head">Stamp it once. Replay it, and watch it void.</h2>
             </div>
             <p className="muted">This is idempotency made physical. The same tx hash can clear once. A replay is blocked and stamped void, pointing at the original.</p>
@@ -355,6 +357,10 @@ function Demo() {
                   </button>
                 </Magnetic>
               </div>
+              <p className="demo-sim">
+                Runs locally. No wallet, no chain, no funds move. The real proof is
+                the live Atlantic test suite and a funded on-chain run.
+              </p>
             </div>
 
             <div>
