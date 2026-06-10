@@ -51,13 +51,38 @@ the reliability layer above it does not change. Reproduce the finding with:
 npm run step0
 ```
 
-## Install and run
+## Use it in one line
+
+Tollgate is an MCP server. Point any MCP client at it with `npx`, no clone, no
+build. It is zero-config by default: the signing secret is generated and
+persisted on first run, so the merchant tools work immediately. A private key is
+only needed to pay (buyer side) or to settle on-chain.
+
+```jsonc
+{
+  "mcpServers": {
+    "tollgate": {
+      "command": "npx",
+      "args": ["-y", "x402-merchant"],
+      "env": {
+        "TOLLGATE_NETWORK": "atlantic"
+      }
+    }
+  }
+}
+```
+
+That JSON drops straight into a Claude Desktop or any MCP client config. Add
+`TOLLGATE_PRIVATE_KEY` when the agent needs to pay or settle. A `smithery.yaml`
+is included for one-click discovery in MCP registries.
+
+## Install from source
 
 Requires Node 20 or newer.
 
 ```
 npm install
-cp .env.example .env        # set TOLLGATE_SIGNING_SECRET, and a key for paying
+cp .env.example .env        # optional: set a key for paying, pick a network
 npm run build
 ```
 
@@ -139,6 +164,27 @@ facilitator only grants when the signature recovers the on-chain payer.
 `pay_for_resource` signs automatically. Signatures are always verified when
 present, and a merchant can make them mandatory with
 `TOLLGATE_REQUIRE_CLAIM_SIGNATURE=true`.
+
+## Build on Tollgate
+
+Tollgate is meant to be reused, not just run. Any builder can gate an endpoint
+on Pharos with three calls and never write payment infrastructure:
+
+```
+# 1. Get a ready-to-use middleware config for your route and price.
+protect_endpoint({ route: "GET /report", priceUsdc: "0.10", payTo: "0xYourMerchant" })
+
+# 2. On each incoming request, verify the payment. Idempotent: a tx can never pay twice.
+verify_payment({ priceUsdc: "0.10", resource: "GET /report", payTo: "0xYourMerchant", paymentHeader })
+# -> { grant: true, receipt: { id, status: "PAID", txHash } }
+
+# 3. Hand the buyer a session so they do not re-verify on-chain every request.
+issue_access_token({ receiptId: "rcpt_..." })
+```
+
+The buyer side is just as small: `pay_for_resource({ url })` pays a 402-gated
+endpoint within your spend caps and returns the resource plus a receipt. Two
+agents, one skill, every paid call.
 
 ## Tests
 

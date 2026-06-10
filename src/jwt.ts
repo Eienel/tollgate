@@ -4,6 +4,7 @@
 // dependency. The token carries a reference to the payment that bought it.
 
 import { createHmac, timingSafeEqual } from "node:crypto";
+import { signingSecret } from "./secret.js";
 
 function b64url(input: Buffer | string): string {
   return Buffer.from(input)
@@ -22,15 +23,7 @@ function fromB64url(input: string): Buffer {
   return Buffer.from(input.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64");
 }
 
-function secret(): string {
-  const s = process.env.TOLLGATE_SIGNING_SECRET?.trim();
-  if (!s) {
-    throw new Error(
-      "TOLLGATE_SIGNING_SECRET is not set. Set a long random value to sign session tokens.",
-    );
-  }
-  return s;
-}
+const secret = signingSecret;
 
 export interface AccessTokenClaims {
   // Subject: the payer address that bought this session.

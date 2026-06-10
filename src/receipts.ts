@@ -7,6 +7,7 @@ import { createHmac, randomUUID } from "node:crypto";
 import { formatUnits } from "viem";
 import { JsonlStore } from "./idempotency.js";
 import { EXPLORER_URL } from "./chain.js";
+import { signingSecret } from "./secret.js";
 
 export type ReceiptStatus = "PAID" | "VOID";
 
@@ -31,16 +32,6 @@ export interface Receipt {
   createdAt: string;
   // HMAC over the canonical fields. Verifiable, tamper-evident.
   signature: string;
-}
-
-function signingSecret(): string {
-  const s = process.env.TOLLGATE_SIGNING_SECRET?.trim();
-  if (!s) {
-    throw new Error(
-      "TOLLGATE_SIGNING_SECRET is not set. Set a long random value to sign receipts.",
-    );
-  }
-  return s;
 }
 
 // The exact bytes that get signed. Order matters and must never change for a

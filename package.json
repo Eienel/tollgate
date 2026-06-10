@@ -1,18 +1,44 @@
 {
   "name": "x402-merchant",
   "version": "0.1.0",
-  "private": true,
-  "description": "Tollgate: a production-grade x402 merchant layer for Pharos Atlantic. Turns any AI agent into a reliable paid merchant and a paying buyer, with idempotent verification, verifiable receipts, post-payment sessions, and a bundled facilitator.",
+  "description": "Tollgate: a production-grade x402 merchant layer for Pharos. Turns any AI agent into a reliable paid merchant and a paying buyer, with idempotent verification, verifiable receipts, post-payment sessions, and a bundled facilitator. Atlantic testnet and Pacific mainnet.",
+  "keywords": [
+    "x402",
+    "pharos",
+    "mcp",
+    "model-context-protocol",
+    "payments",
+    "agent",
+    "stablecoin",
+    "merchant",
+    "402"
+  ],
+  "homepage": "https://tollgate-pharos.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Eienel/tollgate.git"
+  },
   "type": "module",
   "license": "Apache-2.0",
   "bin": {
     "x402-merchant": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "SKILL.md",
+    "README.md",
+    "DECISION.md",
+    ".env.example"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build",
     "start": "node dist/index.js",
     "dev": "node --import tsx src/index.ts",
     "step0": "node --import tsx scripts/check-eip3009.ts",

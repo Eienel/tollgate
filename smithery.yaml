@@ -1,0 +1,39 @@
+# Smithery manifest so MCP clients can discover and launch Tollgate with no
+# local setup. See https://smithery.ai. Tollgate is zero-config by default: it
+# generates and persists a signing secret on first run, so the merchant tools
+# work immediately. A private key is only needed to pay or to settle on-chain.
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      TOLLGATE_NETWORK:
+        type: string
+        enum: [atlantic, mainnet]
+        default: atlantic
+        description: Pharos network preset. atlantic = testnet 688689, mainnet = Pacific 1672.
+      TOLLGATE_PRIVATE_KEY:
+        type: string
+        description: Hex key for paying and settling. Only needed for the buyer side or live settle. Read from env, redacted from logs.
+      TOLLGATE_PAY_TO:
+        type: string
+        description: Address that receives merchant payments. Defaults to the key's address.
+      TOLLGATE_USDC_ADDRESS:
+        type: string
+        description: Payment token. Defaults to the verified Atlantic test USDC. Required on mainnet.
+      TOLLGATE_SIGNING_SECRET:
+        type: string
+        description: HMAC secret for receipts and tokens. Optional; generated and persisted if unset.
+    required: []
+  commandFunction: |
+    (config) => ({
+      command: "npx",
+      args: ["-y", "x402-merchant"],
+      env: {
+        TOLLGATE_NETWORK: config.TOLLGATE_NETWORK || "atlantic",
+        ...(config.TOLLGATE_PRIVATE_KEY ? { TOLLGATE_PRIVATE_KEY: config.TOLLGATE_PRIVATE_KEY } : {}),
+        ...(config.TOLLGATE_PAY_TO ? { TOLLGATE_PAY_TO: config.TOLLGATE_PAY_TO } : {}),
+        ...(config.TOLLGATE_USDC_ADDRESS ? { TOLLGATE_USDC_ADDRESS: config.TOLLGATE_USDC_ADDRESS } : {}),
+        ...(config.TOLLGATE_SIGNING_SECRET ? { TOLLGATE_SIGNING_SECRET: config.TOLLGATE_SIGNING_SECRET } : {})
+      }
+    })
