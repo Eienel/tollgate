@@ -5,6 +5,9 @@
 // the real receipts log. Static: no backend (for example the hosted demo), so
 // Run demo stamps tickets client-side with the same shapes the skill produces.
 
+import { decryptText, decryptOnLoad, setupTilt, attachClickSpark, setupCursorLight } from "./effects.js";
+import { initTracker } from "./tracker.js";
+
 const els = {
   tickets: document.getElementById("tickets"),
   empty: document.getElementById("empty"),
@@ -83,14 +86,22 @@ function ticketRow(r, animate) {
 
   const amount = document.createElement("div");
   amount.className = "amount";
-  amount.textContent = fmtUsdc(r.amount, r.decimals) + " USDC";
+  const amountText = fmtUsdc(r.amount, r.decimals) + " USDC";
+  amount.textContent = amountText;
 
   const link = document.createElement("a");
   link.className = "tx-link";
   link.href = `${explorer}/tx/${r.txHash}`;
   link.target = "_blank";
   link.rel = "noreferrer";
-  link.textContent = shorten(r.txHash, 8, 6);
+  const txText = shorten(r.txHash, 8, 6);
+  link.textContent = txText;
+
+  // A fresh ticket prints its figures: the mono data resolves into place.
+  if (animate) {
+    decryptText(amount, amountText, { duration: 460 });
+    decryptText(link, txText, { charset: "hex", duration: 520 });
+  }
 
   side.append(stamp, amount, link);
   li.append(main, side);
@@ -365,6 +376,12 @@ function setupMagnetic(button) {
 setupReveals();
 setupMagnetic(els.seed);
 
+// Interaction taste. The specimen ticket prints its figures and leans toward
+// the cursor; the stamp button spatters ink; the masthead catches the light.
+decryptOnLoad();
+setupTilt(document.getElementById("specimen"), { baseRotate: -1, max: 6 });
+attachClickSpark(els.seed, { count: 12 });
+setupCursorLight(document.querySelector(".masthead"));
+
 // The live on-chain payment tracker. Reads payments straight from a Pharos RPC.
-import { initTracker } from "./tracker.js";
 initTracker();

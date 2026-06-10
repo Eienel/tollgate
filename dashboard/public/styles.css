@@ -1071,3 +1071,82 @@ body::after {
 #trk-deeper {
   margin-top: var(--space-4);
 }
+
+/* ---------------------------------------------------------------------------
+   Interaction taste: tilt sheen, ink-fleck click spark, cursor light. Paper
+   and ink only. One green accent. All gated under reduced motion below.
+--------------------------------------------------------------------------- */
+
+/* The specimen leans toward the cursor; a faint band of light slides across
+   the paper as it tilts. Not a glass glare, just paper catching the room. */
+.specimen {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.spec-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: var(--sheen-o, 0);
+  transition: opacity 0.3s var(--ease-out);
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) calc(var(--sheen-x, 50%) - 22%),
+    rgba(255, 255, 255, 0.55) var(--sheen-x, 50%),
+    rgba(255, 255, 255, 0) calc(var(--sheen-x, 50%) + 22%),
+    transparent 100%
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* Ink flecks thrown from a press. */
+.spark-layer {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  will-change: transform, opacity;
+}
+
+/* A faint reading light follows the cursor across the masthead paper. */
+.masthead::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out);
+  background: radial-gradient(
+    220px circle at var(--lx, 50%) var(--ly, 30%),
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0) 65%
+  );
+  mix-blend-mode: soft-light;
+}
+
+.masthead.lit::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spec-sheen,
+  .masthead::after {
+    display: none;
+  }
+  .specimen {
+    transform: rotate(-1deg) !important;
+  }
+}
