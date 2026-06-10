@@ -30,8 +30,10 @@ const TOOLS = [
   ["verify_payment", "seller", "Idempotently verify a payment and decide the grant. Never twice."],
   ["issue_access_token", "seller", "Mint a short-lived session token after a verified payment."],
   ["verify_access_token", "seller", "Check a presented token: signature, expiry, claims. No chain calls."],
+  ["get_receipt", "seller", "Fetch one signed receipt and confirm its signature."],
   ["list_receipts", "seller", "List receipts plus an earnings reconciliation summary."],
   ["pay_for_resource", "buyer", "Pay a 402-gated endpoint per call within spend caps."],
+  ["facilitator_status", "infra", "Health of the bundled facilitator: RPC, budget, account."],
 ];
 
 const CHIPS = [
@@ -127,9 +129,6 @@ function Hero() {
     <section className="hero">
       <img className="hero-paper" src={IMG.paper} alt="" aria-hidden="true" loading="lazy" />
       <div className="wrap">
-        <motion.span className="eyebrow" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <span className="dot" /> x402 merchant layer for Pharos
-        </motion.span>
         <div className="hero-grid">
           <div>
             <h1 className="display">
@@ -171,7 +170,7 @@ function Hero() {
             </motion.div>
             <div className="hero-facts">
               <Reveal className="fact" delay={0.7}>
-                <div className="n"><CountUp to={7} /></div>
+                <div className="n"><CountUp to={8} /></div>
                 <div className="l">MCP tools</div>
               </Reveal>
               <Reveal className="fact" delay={0.78}>
@@ -410,7 +409,7 @@ function Tools() {
         <div className="section-head">
           <div>
             <div className="kicker">The surface</div>
-            <h2 className="head">Seven tools. Two sides. One skill.</h2>
+            <h2 className="head">Eight tools. Two sides. One skill.</h2>
           </div>
           <p>Mount it over stdio or HTTP. Any agent can sell, and any agent can pay.</p>
         </div>
