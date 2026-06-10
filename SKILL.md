@@ -1,6 +1,6 @@
 ---
 name: x402-merchant
-description: Turn an agent into a reliable paid merchant on Pharos Atlantic using x402, and let an agent pay for 402-gated resources. Use when an agent needs to charge for an endpoint, verify an incoming x402 payment without ever billing twice, mint a session token after payment, reconcile earnings, or pay another service per call. Built for Pharos Atlantic Testnet (chain id 688689).
+description: Turn an agent into a reliable paid merchant on Pharos using x402, and let an agent pay for 402-gated resources. Use when an agent needs to charge for an endpoint, verify an incoming x402 payment without ever billing twice, mint a session token after payment, reconcile earnings, or pay another service per call. Runs on Pharos Atlantic Testnet (688689) and Pacific Mainnet (1672).
 ---
 
 # x402-merchant (Tollgate)
@@ -11,6 +11,15 @@ merchant: idempotent verification that can never grant or bill the same payment
 twice, verifiable receipts, post-payment session tokens, earnings reconciliation,
 and a bundled facilitator, since Pharos has no hosted one. It is two-sided, so the
 same skill also lets an agent pay for resources.
+
+Live demo and full documentation: https://tollgate-pharos.vercel.app
+Source: https://github.com/Eienel/tollgate
+
+## Networks
+
+Runs on both Pharos networks, selected with TOLLGATE_NETWORK:
+- atlantic (default): Atlantic Testnet, chain id 688689, with the verified test USDC preconfigured.
+- mainnet: Pacific Mainnet, chain id 1672 (rpc.pharos.xyz). Set TOLLGATE_USDC_ADDRESS to the token you charge in; there is no test default on mainnet.
 
 ## Reliability model
 
