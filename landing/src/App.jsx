@@ -443,8 +443,13 @@ function Start() {
           <p>Zero-config by default. A signing secret is generated and persisted on first run. A key is only needed to pay or settle.</p>
         </div>
         <Reveal>
+          <div className="code" style={{ marginBottom: 16 }}>
+            <div><span className="m">npm install x402-merchant</span></div>
+          </div>
+        </Reveal>
+        <Reveal>
           <div className="code">
-            <div><span className="m">// any MCP client config</span></div>
+            <div><span className="m">// add to your MCP client config</span></div>
             <div>{"{"}</div>
             <div>&nbsp;&nbsp;"mcpServers": {"{"}</div>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;"tollgate": {"{"}</div>
