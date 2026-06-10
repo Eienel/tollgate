@@ -479,23 +479,64 @@ function Footer() {
   );
 }
 
+const NAV_LINKS = [
+  ["#why", "Why"],
+  ["#demo", "Demo"],
+  ["#tools", "Tools"],
+  ["#start", "Install"],
+];
+
+function Nav() {
+  const [open, setOpen] = useState(false);
+  return (
+    <nav className="nav">
+      <div className="wrap nav-inner">
+        <span className="brand"><GateMark /> Tollgate</span>
+        <div className="nav-links">
+          {NAV_LINKS.map(([href, label]) => (
+            <a key={href} href={href}>{label}</a>
+          ))}
+        </div>
+        <div className="nav-right">
+          <a className="nav-cta" href={SITE} target="_blank" rel="noreferrer">Live ledger</a>
+          <button
+            className={`nav-burger${open ? " open" : ""}`}
+            type="button"
+            aria-label="Menu"
+            aria-expanded={open}
+            onClick={() => setOpen((o) => !o)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </div>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="nav-sheet"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {NAV_LINKS.map(([href, label]) => (
+              <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}
+
 export default function App() {
   return (
     <>
       <ScrollProgress />
       <CustomCursor />
-      <nav className="nav">
-        <div className="wrap nav-inner">
-          <span className="brand"><GateMark /> Tollgate</span>
-          <div className="nav-links">
-            <a href="#why">Why</a>
-            <a href="#demo">Demo</a>
-            <a href="#tools">Tools</a>
-            <a href="#start">Install</a>
-          </div>
-          <a className="nav-cta" href={SITE} target="_blank" rel="noreferrer">Live ledger</a>
-        </div>
-      </nav>
+      <Nav />
       <Hero />
       <Marquee />
       <Gaps />
