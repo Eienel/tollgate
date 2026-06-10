@@ -10,7 +10,9 @@ Pharos Atlantic, and it ships the facilitator Pharos does not host for you.
 
 This is a TypeScript MCP server. Default transport is stdio; an HTTP transport is
 optional. The headline feature is idempotency: a payment can never grant access or
-be billed twice, and that guarantee survives a restart.
+be billed twice, and that guarantee survives a restart. It runs on both Pharos
+networks: Atlantic testnet (688689) by default, or Pacific mainnet (1672) by
+setting `TOLLGATE_NETWORK=mainnet`.
 
 ## Why this exists
 
@@ -94,10 +96,11 @@ the dashboard to seed a PAID and a duplicate VOID and see the same story.
 
 | Variable | Meaning | Default |
 | --- | --- | --- |
-| `TOLLGATE_CHAIN_ID` | Pharos Atlantic chain id | `688689` |
-| `TOLLGATE_RPC_URL` | Atlantic RPC | `https://atlantic.dplabs-internal.com` |
-| `TOLLGATE_EXPLORER_URL` | Atlantic explorer | `https://atlantic.pharosscan.xyz` |
-| `TOLLGATE_USDC_ADDRESS` | Test USDC (plain ERC-20, 6 decimals) | `0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8` |
+| `TOLLGATE_NETWORK` | Preset: `atlantic` (testnet) or `mainnet` (Pacific) | `atlantic` |
+| `TOLLGATE_CHAIN_ID` | Override the preset chain id | preset (688689 / 1672) |
+| `TOLLGATE_RPC_URL` | Override the preset RPC | preset |
+| `TOLLGATE_EXPLORER_URL` | Override the preset explorer | preset |
+| `TOLLGATE_USDC_ADDRESS` | Payment token. Required on mainnet (no default) | Atlantic test USDC |
 | `TOLLGATE_PRIVATE_KEY` | Hex key for paying and settling. Read from env, redacted from logs | none |
 | `TOLLGATE_PAY_TO` | Address that receives merchant payments | the key's address |
 | `TOLLGATE_DATA_DIR` | Where the idempotency log and receipts ledger live | `./.tollgate` |

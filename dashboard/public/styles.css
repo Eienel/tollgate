@@ -1005,3 +1005,69 @@ body::after {
     font-size: 48px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Live payment tracker. Reuses ticket and totals tokens; adds only the form.
+--------------------------------------------------------------------------- */
+
+.trk-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+  margin: var(--space-4) 0;
+}
+
+.trk-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.trk-grow {
+  flex: 1 1 220px;
+}
+
+.trk-field span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.trk-field input,
+.trk-field select {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: 9px 11px;
+  transition: border-color 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+
+.trk-field input:focus,
+.trk-field select:focus {
+  outline: none;
+  border-color: var(--stamp);
+  box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.12);
+}
+
+.trk-scan {
+  height: 38px;
+}
+
+.trk-totals {
+  margin: var(--space-4) 0;
+  gap: var(--space-6);
+}
+
+#trk-list {
+  margin-top: var(--space-4);
+}
+
+#trk-deeper {
+  margin-top: var(--space-4);
+}

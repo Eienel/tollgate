@@ -364,3 +364,7 @@ function setupMagnetic(button) {
 
 setupReveals();
 setupMagnetic(els.seed);
+
+// The live on-chain payment tracker. Reads payments straight from a Pharos RPC.
+import { initTracker } from "./tracker.js";
+initTracker();

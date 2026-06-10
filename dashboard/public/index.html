@@ -102,7 +102,62 @@
         <p class="ledger-note muted" id="mode-note"></p>
       </section>
 
-      <section class="doc" data-no="01">
+      <section class="doc tracker" data-no="01">
+        <h2>Live payment tracker</h2>
+        <p>
+          Count real payments made to any merchant address, read straight from the
+          chain in your browser. Works on both Pharos networks. The count is kept in
+          this browser and grows as new blocks arrive; scan deeper to reach further
+          back. No backend, no wallet connection, read only.
+        </p>
+
+        <div class="trk-form">
+          <label class="trk-field">
+            <span>Network</span>
+            <select id="trk-network">
+              <option value="atlantic">Atlantic testnet (688689)</option>
+              <option value="mainnet">Pacific mainnet (1672)</option>
+            </select>
+          </label>
+          <label class="trk-field trk-grow">
+            <span>Merchant address (payTo)</span>
+            <input id="trk-address" type="text" inputmode="text" spellcheck="false" placeholder="0x..." />
+          </label>
+          <label class="trk-field trk-grow">
+            <span>Token</span>
+            <input id="trk-token" type="text" spellcheck="false" placeholder="Token address" />
+          </label>
+          <button id="trk-scan" class="ghost trk-scan" type="button">Track payments</button>
+        </div>
+
+        <p class="ledger-note muted" id="trk-status">Enter a merchant address to begin.</p>
+
+        <div id="trk-results" hidden>
+          <dl class="totals trk-totals">
+            <div class="total">
+              <dt>Payments tracked</dt>
+              <dd class="figure" id="trk-count">0</dd>
+            </div>
+            <div class="total">
+              <dt>Total received</dt>
+              <dd class="figure" id="trk-total">0.00</dd>
+              <dd class="unit">USDC</dd>
+            </div>
+          </dl>
+
+          <ol id="trk-list" class="tickets" aria-label="Tracked payments"></ol>
+
+          <div id="trk-empty" class="empty stub" hidden>
+            <div class="perf"></div>
+            <p>No payments found in the scanned range.</p>
+            <p class="muted">Scan deeper to reach further back, or check the address and token.</p>
+          </div>
+
+          <button id="trk-deeper" class="ghost" type="button" hidden>Scan deeper</button>
+        </div>
+      </section>
+
+      <section class="doc" data-no="02">
         <h2>How the gate works</h2>
         <ol class="steps">
           <li>
@@ -129,7 +184,7 @@
         </ol>
       </section>
 
-      <section class="doc" data-no="02">
+      <section class="doc" data-no="03">
         <h2>Why this exists</h2>
         <p>
           The official Pharos x402 example gets you a demo. Shipping a real paid service
@@ -156,7 +211,7 @@
         </div>
       </section>
 
-      <section class="doc" data-no="03">
+      <section class="doc" data-no="04">
         <h2>The STEP 0 finding</h2>
         <p>
           Before building the payment path, Tollgate probes whether the Atlantic test USDC
@@ -184,7 +239,7 @@
         </p>
       </section>
 
-      <section class="doc" data-no="04">
+      <section class="doc" data-no="05">
         <h2>Reliability model</h2>
         <ul class="plain-list">
           <li>Every payment is keyed by its settlement tx hash in an append-only log that survives restart. The first verify grants and prints PAID. Any repeat prints VOID and points at the original.</li>
@@ -195,7 +250,7 @@
         </ul>
       </section>
 
-      <section class="doc" data-no="05">
+      <section class="doc" data-no="06">
         <h2>Tools</h2>
         <table class="data">
           <thead>
@@ -214,7 +269,7 @@
         </table>
       </section>
 
-      <section class="doc" data-no="06">
+      <section class="doc" data-no="07">
         <h2>Quickstart</h2>
         <p>Requires Node 20 or newer. Runs as an MCP server over stdio by default, or HTTP.</p>
 <pre class="code"><code>npm install
@@ -235,7 +290,7 @@ TOLLGATE_PRIVATE_KEY=0xFundedKey npm run buyer -- --replay</code></pre>
         </p>
       </section>
 
-      <section class="doc" data-no="07">
+      <section class="doc" data-no="08">
         <h2>Network facts</h2>
         <table class="data">
           <tbody>
@@ -249,7 +304,7 @@ TOLLGATE_PRIVATE_KEY=0xFundedKey npm run buyer -- --replay</code></pre>
         </table>
       </section>
 
-      <section class="doc" data-no="08">
+      <section class="doc" data-no="09">
         <h2>Phase 2: a paid data merchant agent</h2>
         <p>
           Tollgate is the foundation for an Agent Arena entrant. The agent gates a resource

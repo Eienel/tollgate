@@ -1,6 +1,7 @@
 // chain.ts
-// Pharos Atlantic Testnet (chain id 688689) defined once with viem and reused
-// everywhere. Also holds the verified test USDC address, a minimal ERC-20 ABI,
+// The Pharos chain Tollgate runs on, defined once with viem and reused
+// everywhere. Holds the network presets (Atlantic testnet and Pacific
+// mainnet), the verified test USDC address, a minimal ERC-20 ABI,
 // retry-with-backoff, a rate-limit and pending-tx budget, and key redaction.
 
 import {
@@ -16,35 +17,90 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-export const CHAIN_ID = 688689;
+// The Pharos networks Tollgate knows. Select with TOLLGATE_NETWORK=atlantic
+// (default) or mainnet; any field can still be overridden by its own env var.
+// Both chain ids and RPCs are verified live (see DECISION.md).
+interface NetworkPreset {
+  id: number;
+  name: string;
+  rpc: string;
+  wss?: string;
+  explorer: string;
+  symbol: string;
+  testnet: boolean;
+  // Default payment token, where one is known and verified. On mainnet there
+  // is no verified default; set TOLLGATE_USDC_ADDRESS explicitly.
+  usdc?: Address;
+}
+
+const PRESETS: Record<string, NetworkPreset> = {
+  atlantic: {
+    id: 688689,
+    name: "Pharos Atlantic Testnet",
+    rpc: "https://atlantic.dplabs-internal.com",
+    wss: "wss://atlantic.dplabs-internal.com",
+    explorer: "https://atlantic.pharosscan.xyz",
+    symbol: "PHRS",
+    testnet: true,
+    usdc: "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8",
+  },
+  mainnet: {
+    id: 1672,
+    name: "Pharos Pacific Mainnet",
+    rpc: "https://rpc.pharos.xyz",
+    explorer: "https://pharosscan.xyz",
+    symbol: "PROS",
+    testnet: false,
+  },
+};
+
+const presetName = (process.env.TOLLGATE_NETWORK ?? "atlantic").trim().toLowerCase();
+const preset = PRESETS[presetName];
+if (!preset) {
+  throw new Error(
+    `Unknown TOLLGATE_NETWORK "${presetName}". Use one of: ${Object.keys(PRESETS).join(", ")}.`,
+  );
+}
+
+export const IS_TESTNET = preset.testnet;
+export const NETWORK_LABEL = preset.name;
+export const CHAIN_ID = Number(process.env.TOLLGATE_CHAIN_ID ?? preset.id);
 
 // x402 networks are namespaced strings. For an EVM chain this is eip155:<id>.
 export const NETWORK = `eip155:${CHAIN_ID}` as const;
 
-export const RPC_URL =
-  process.env.TOLLGATE_RPC_URL ?? "https://atlantic.dplabs-internal.com";
-export const WSS_URL =
-  process.env.TOLLGATE_WSS_URL ?? "wss://atlantic.dplabs-internal.com";
-export const EXPLORER_URL =
-  process.env.TOLLGATE_EXPLORER_URL ?? "https://atlantic.pharosscan.xyz";
+export const RPC_URL = process.env.TOLLGATE_RPC_URL ?? preset.rpc;
+export const WSS_URL = process.env.TOLLGATE_WSS_URL ?? preset.wss;
+export const EXPLORER_URL = process.env.TOLLGATE_EXPLORER_URL ?? preset.explorer;
 
-// Verified plain ERC-20 (6 decimals). No EIP-3009. See DECISION.md / npm run step0.
-export const USDC_ADDRESS = (process.env.TOLLGATE_USDC_ADDRESS ??
-  "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8") as Address;
+// The payment token. On Atlantic this defaults to the verified test USDC, a
+// plain ERC-20 with no EIP-3009 (see DECISION.md / npm run step0). On mainnet
+// there is no verified default; the merchant chooses and sets it explicitly.
+const envToken = process.env.TOLLGATE_USDC_ADDRESS?.trim();
+const resolvedToken = envToken ?? preset.usdc;
+if (!resolvedToken) {
+  throw new Error(
+    `No payment token configured for ${preset.name}. Set TOLLGATE_USDC_ADDRESS to the ERC-20 you charge in.`,
+  );
+}
+export const USDC_ADDRESS = resolvedToken as Address;
 
-// Atlantic, defined once.
-export const atlantic = defineChain({
+// The selected Pharos chain, defined once.
+export const pharosChain = defineChain({
   id: CHAIN_ID,
-  name: "Pharos Atlantic Testnet",
-  nativeCurrency: { name: "Pharos", symbol: "PHRS", decimals: 18 },
+  name: preset.name,
+  nativeCurrency: { name: "Pharos", symbol: preset.symbol, decimals: 18 },
   rpcUrls: {
-    default: { http: [RPC_URL], webSocket: [WSS_URL] },
+    default: { http: [RPC_URL], webSocket: WSS_URL ? [WSS_URL] : undefined },
   },
   blockExplorers: {
     default: { name: "PharosScan", url: EXPLORER_URL },
   },
-  testnet: true,
+  testnet: preset.testnet,
 });
+
+// Backwards-compatible alias; most of the codebase grew up on Atlantic.
+export const atlantic = pharosChain;
 
 // Minimal ERC-20 surface. This token only supports the standard methods.
 export const erc20Abi = [
