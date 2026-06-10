@@ -1,0 +1,19 @@
+{
+  "name": "tollgate",
+  "metadata": {
+    "description": "The Tollgate marketplace: an x402 merchant layer for Pharos, packaged as an installable Claude Code plugin."
+  },
+  "owner": {
+    "name": "Eienel",
+    "url": "https://github.com/Eienel"
+  },
+  "plugins": [
+    {
+      "name": "tollgate",
+      "source": "./",
+      "description": "x402 merchant layer for Pharos. Idempotent verification, signed receipts, post-payment sessions, and a bundled facilitator, exposed as eight MCP tools across the seller and buyer sides.",
+      "category": "payments",
+      "tags": ["x402", "pharos", "payments", "mcp", "usdc", "agent"]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "tollgate",
+  "description": "x402 merchant layer for Pharos: idempotent payment verification that never bills or grants twice, signed receipts, post-payment session tokens, earnings reconciliation, and a bundled facilitator. Two-sided, so an agent can sell a service or pay for one.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Eienel"
+  },
+  "homepage": "https://tollgate-pharos.vercel.app",
+  "repository": "https://github.com/Eienel/tollgate",
+  "license": "Apache-2.0"
+}

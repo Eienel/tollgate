@@ -60,6 +60,22 @@ That JSON drops straight into a Claude Desktop or any MCP client config. Add
 `TOLLGATE_PRIVATE_KEY` when the agent needs to pay or settle. A `smithery.yaml`
 is included for one-click discovery in MCP registries.
 
+## Install as a Claude Code plugin
+
+This repo is also a Claude Code plugin marketplace. Inside Claude Code, two lines
+add the marketplace and install Tollgate, which registers the MCP server and the
+skill in one step:
+
+```
+/plugin marketplace add Eienel/tollgate
+/plugin install tollgate@tollgate
+```
+
+The bundled `.mcp.json` points at `x402-merchant` on npm, so the eight tools come
+online with no extra config. The `SKILL.md` tells the agent when to reach for
+them. To try it before installing, clone the repo and run
+`claude --plugin-dir .`.
+
 ## Install from source
 
 Requires Node 20 or newer.

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "tollgate": {
+      "command": "npx",
+      "args": ["-y", "x402-merchant"],
+      "env": {
+        "TOLLGATE_NETWORK": "atlantic"
+      }
+    }
+  }
+}
