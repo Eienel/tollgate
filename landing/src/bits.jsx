@@ -12,6 +12,57 @@ import {
 
 export const SPRING = { type: "spring", stiffness: 120, damping: 18, mass: 0.9 };
 
+// True on coarse pointers (touch). Used to drop hover-only flourishes on phones.
+export function useIsTouch() {
+  const [touch, setTouch] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    const set = () => setTouch(mq.matches);
+    set();
+    mq.addEventListener?.("change", set);
+    return () => mq.removeEventListener?.("change", set);
+  }, []);
+  return touch;
+}
+
+// A stamp-ring cursor that follows the pointer and swells over interactive
+// elements. Desktop only; it renders nothing on touch or reduced motion.
+export function CustomCursor() {
+  const touch = useIsTouch();
+  const reduce = useReducedMotion();
+  const x = useSpring(useMotionValue(-100), { stiffness: 500, damping: 40, mass: 0.6 });
+  const y = useSpring(useMotionValue(-100), { stiffness: 500, damping: 40, mass: 0.6 });
+  const dx = useMotionValue(-100);
+  const dy = useMotionValue(-100);
+  const [hot, setHot] = useState(false);
+
+  useEffect(() => {
+    if (touch || reduce) return;
+    document.documentElement.classList.add("cursor-on");
+    const move = (e) => {
+      x.set(e.clientX);
+      y.set(e.clientY);
+      dx.set(e.clientX);
+      dy.set(e.clientY);
+      const el = e.target;
+      setHot(!!el.closest("a, button, .card, .big-ticket, .tool"));
+    };
+    window.addEventListener("pointermove", move);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      document.documentElement.classList.remove("cursor-on");
+    };
+  }, [touch, reduce]);
+
+  if (touch || reduce) return null;
+  return (
+    <>
+      <motion.div className={`cursor${hot ? " hot" : ""}`} style={{ x, y, scale: hot ? 1.6 : 1 }} />
+      <motion.div className="cursor-dot" style={{ x: dx, y: dy }} />
+    </>
+  );
+}
+
 // Decrypted text. Glyphs resolve into the final string, left to right, like a
 // dot-matrix printer settling a ticket. Runs when scrolled into view.
 const HEX = "0123456789abcdef";
@@ -59,11 +110,12 @@ export function Decrypt({ text, charset = "alnum", className, as: Tag = "span", 
 export function Magnetic({ children, strength = 0.4, className, ...rest }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
+  const touch = useIsTouch();
   const x = useSpring(useMotionValue(0), SPRING);
   const y = useSpring(useMotionValue(0), SPRING);
 
   function move(e) {
-    if (reduce || !ref.current) return;
+    if (reduce || touch || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
     x.set((e.clientX - (r.left + r.width / 2)) * strength);
     y.set((e.clientY - (r.top + r.height / 2)) * strength);
@@ -90,11 +142,12 @@ export function Magnetic({ children, strength = 0.4, className, ...rest }) {
 export function Tilt({ children, className, max = 9, base = 0 }) {
   const ref = useRef(null);
   const reduce = useReducedMotion();
+  const touch = useIsTouch();
   const rx = useSpring(useMotionValue(0), SPRING);
   const ry = useSpring(useMotionValue(0), SPRING);
 
   function move(e) {
-    if (reduce || !ref.current) return;
+    if (reduce || touch || !ref.current) return;
     const r = ref.current.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - 0.5;
     const py = (e.clientY - r.top) / r.height - 0.5;

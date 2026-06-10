@@ -1,9 +1,22 @@
-import { useState } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Decrypt, Magnetic, Tilt, CountUp, Reveal, SPRING } from "./bits.jsx";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { Decrypt, Magnetic, Tilt, CountUp, Reveal, CustomCursor, useIsTouch, SPRING } from "./bits.jsx";
 
 const SITE = "https://tollgate-pharos.vercel.app";
 const REPO = "https://github.com/Eienel/tollgate";
+
+// On-theme photos from Unsplash, treated as ink-and-paper duotone in CSS.
+const IMG = {
+  press: "https://images.unsplash.com/photo-1581508512961-0e3b9524db40?w=1600&q=70&auto=format&fit=crop",
+  booth: "https://images.unsplash.com/photo-1611839267623-8a861c18d52c?w=900&q=65&auto=format&fit=crop",
+  paper: "https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=1200&q=60&auto=format&fit=crop",
+};
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 26, mass: 0.4 });
+  return <motion.div className="progress" style={{ scaleX }} />;
+}
 
 const GAPS = [
   ["01", "No hosted facilitator", "Pharos runs no verify-and-settle service; the public facilitator is Base only. Tollgate bundles one for Atlantic and Pacific with retry, idempotent settle, and a health probe."],
@@ -44,15 +57,40 @@ function GateMark() {
 
 function HeroTicket() {
   const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, -60]);
+  const yScroll = useTransform(scrollY, [0, 600], [0, -60]);
+  const touch = useIsTouch();
+  const stageRef = useRef(null);
+
+  // The ticket leans toward the pointer as it crosses the stage, and can be
+  // grabbed and flung; it springs back to true.
+  const rx = useSpring(useMotionValue(0), { stiffness: 120, damping: 14 });
+  const ry = useSpring(useMotionValue(0), { stiffness: 120, damping: 14 });
+  function move(e) {
+    if (touch || !stageRef.current) return;
+    const r = stageRef.current.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    ry.set(px * 22);
+    rx.set(-py * 18);
+  }
+  function leave() {
+    rx.set(0);
+    ry.set(0);
+  }
+
   return (
-    <div className="ticket-stage">
+    <div className="ticket-stage" ref={stageRef} onPointerMove={move} onPointerLeave={leave}>
       <motion.div
         className="big-ticket"
-        style={{ y }}
+        style={{ y: yScroll, rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
         initial={{ opacity: 0, y: 30, rotateX: 12 }}
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{ ...SPRING, delay: 0.15 }}
+        drag={!touch}
+        dragSnapToOrigin
+        dragElastic={0.18}
+        dragConstraints={{ left: -60, right: 60, top: -40, bottom: 40 }}
+        whileDrag={{ cursor: "grabbing", scale: 1.03 }}
       >
         <span className="bt-perf l" />
         <span className="bt-perf r" />
@@ -76,6 +114,9 @@ function HeroTicket() {
           Paid
         </motion.span>
       </motion.div>
+      <div className="hero-photo" aria-hidden="true">
+        <img src={IMG.booth} alt="" loading="lazy" />
+      </div>
     </div>
   );
 }
@@ -84,6 +125,7 @@ function Hero() {
   const lines = ["Pay at", "the gate."];
   return (
     <section className="hero">
+      <img className="hero-paper" src={IMG.paper} alt="" aria-hidden="true" loading="lazy" />
       <div className="wrap">
         <motion.span className="eyebrow" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <span className="dot" /> x402 merchant layer for Pharos
@@ -167,6 +209,24 @@ function Marquee() {
         ))}
       </motion.div>
     </div>
+  );
+}
+
+function Band({ img, kicker, title, sub }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
+  return (
+    <section className="band" ref={ref}>
+      <motion.img src={img} alt="" loading="lazy" style={{ y, scale: 1.2 }} />
+      <div className="wrap band-text">
+        <Reveal>
+          <div className="kicker">{kicker}</div>
+          <h2>{title}</h2>
+          <p>{sub}</p>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
@@ -423,6 +483,8 @@ function Footer() {
 export default function App() {
   return (
     <>
+      <ScrollProgress />
+      <CustomCursor />
       <nav className="nav">
         <div className="wrap nav-inner">
           <span className="brand"><GateMark /> Tollgate</span>
@@ -438,6 +500,12 @@ export default function App() {
       <Hero />
       <Marquee />
       <Gaps />
+      <Band
+        img={IMG.press}
+        kicker="Infrastructure, not a demo"
+        title="Payment rails an agent can run a business on."
+        sub="Verify, settle, receipt, reconcile. The unglamorous machinery that turns a clever demo into a merchant that gets paid."
+      />
       <Step0 />
       <Demo />
       <Tools />

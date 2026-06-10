@@ -14,8 +14,10 @@
   --stamp-deep: #245540;
   --void: #b23b2e;
 
-  --serif: "Fraunces", Georgia, "Times New Roman", serif;
-  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* System UI for text, monospace for data. The clean stack, kept bold. */
+  --ui: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --serif: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --maxw: 1120px;
@@ -33,7 +35,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--mono);
+  font-family: var(--ui);
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -722,4 +724,237 @@ h2.head {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   v3: clean type split. Headings system-bold; ticket data monospace.
+--------------------------------------------------------------------------- */
+h1.display,
+h2.head,
+.card h3,
+.foot h3,
+.brand {
+  font-family: var(--ui);
+  letter-spacing: -0.035em;
+}
+
+.bt-route,
+.bt-amount .v,
+.fact .n,
+.counter .v,
+.demo-ticket .r,
+.demo-ticket .big {
+  font-family: var(--mono);
+  letter-spacing: -0.02em;
+}
+
+/* Scroll progress: a thin ledger-green rule pinned to the top. */
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--stamp);
+  transform-origin: 0 50%;
+  z-index: 100;
+}
+
+/* Custom cursor (desktop, fine pointer only). A stamp ring that follows the
+   pointer and swells over interactive things. */
+@media (hover: hover) and (pointer: fine) {
+  .cursor-on,
+  .cursor-on * {
+    cursor: none;
+  }
+}
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 120;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: multiply;
+}
+.cursor.hot {
+  border-color: var(--stamp);
+}
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ink);
+  pointer-events: none;
+  z-index: 120;
+  transform: translate(-50%, -50%);
+}
+
+/* Draggable hero ticket. */
+.big-ticket {
+  cursor: grab;
+}
+.big-ticket:active {
+  cursor: grabbing;
+}
+
+/* Photo bands, ink-and-paper duotone so any frame reads as intentional. */
+.band {
+  position: relative;
+  height: 360px;
+  overflow: hidden;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--ink);
+}
+.band img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.08) brightness(0.62);
+  opacity: 0.55;
+}
+.band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--stamp) 26%, transparent);
+  mix-blend-mode: multiply;
+}
+.band-text {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.band-text .kicker {
+  color: #9fe3bf;
+}
+.band-text h2 {
+  font-family: var(--ui);
+  font-weight: 900;
+  color: var(--paper);
+  font-size: clamp(30px, 5vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  margin: 10px 0 0;
+  max-width: 20ch;
+}
+.band-text p {
+  color: #cfcabd;
+  max-width: 46ch;
+  margin: 16px 0 0;
+}
+
+/* A framed photo accent inside the hero. */
+.hero-photo {
+  position: absolute;
+  right: -40px;
+  bottom: -30px;
+  width: 200px;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  box-shadow: 0 20px 40px -24px rgba(22, 21, 15, 0.5);
+  transform: rotate(4deg);
+  background: var(--ink);
+}
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05) brightness(0.7);
+  opacity: 0.7;
+}
+.hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--stamp) 22%, transparent);
+  mix-blend-mode: multiply;
+}
+
+/* Paper texture wash behind the hero. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.05;
+  filter: grayscale(1);
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile, for real. Coarse pointers lose hover gimmicks; layouts breathe.
+--------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .wrap {
+    padding: 0 18px;
+  }
+  .nav-links {
+    display: none;
+  }
+  .hero {
+    padding: 48px 0 36px;
+  }
+  .pad {
+    padding: 64px 0;
+  }
+  .hero-photo {
+    display: none;
+  }
+  .band {
+    height: 280px;
+  }
+  .demo {
+    border-radius: 14px;
+  }
+  .counter-row {
+    gap: 22px;
+  }
+  .foot h3 {
+    font-size: 30px;
+  }
+  .code {
+    font-size: 12px;
+    padding: 18px;
+  }
+}
+
+@media (pointer: coarse) {
+  .cursor,
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* Faint paper photograph washing the hero. */
+.hero-paper {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.08;
+  filter: grayscale(1) contrast(1.1);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero .wrap {
+  position: relative;
+  z-index: 1;
 }
