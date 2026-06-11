@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tollgate. A production x402 merchant layer for Pharos.</title>
+    <title>Tollgate Ledger. On-chain verification and payment counting.</title>
     <meta
       name="description"
-      content="Tollgate turns any AI agent into a reliable paid merchant on Pharos Atlantic using x402. Idempotent verification, signed receipts, session tokens, and a bundled facilitator."
+      content="A read-only, on-chain ledger for Tollgate payments on Pharos Atlantic. Verify any settlement and count what a merchant has been paid, straight from the chain in your browser."
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="ledger" aria-label="Tollgate">
+    <main class="ledger" aria-label="Tollgate ledger">
       <header class="masthead">
         <div class="atmosphere" aria-hidden="true">
           <span class="ghost-stamp gs-1">PAID</span>
@@ -28,18 +28,19 @@
             </svg>
           </span>
           <div>
-            <h1>Tollgate</h1>
-            <p class="subtitle">An x402 merchant layer for Pharos Atlantic</p>
+            <h1>Tollgate Ledger</h1>
+            <p class="subtitle">On-chain, read only, Pharos Atlantic</p>
           </div>
         </div>
 
-        <p class="display">Pay at the gate.<br /><span class="display-muted">Stamped once, never twice.</span></p>
+        <p class="display">Read straight from the chain.<br /><span class="display-muted">Verify a settlement. Count what a merchant earned.</span></p>
 
         <p class="lede">
-          A TypeScript MCP server that turns any AI agent into a reliable paid merchant on
-          Pharos Atlantic using x402, and lets an agent pay for 402-gated resources. The
-          headline guarantee: a payment can never grant access or be billed twice, and that
-          guarantee survives a restart.
+          This is the ledger, not the pitch. It does two things, both against live
+          Pharos Atlantic in your browser: confirm that a Tollgate settlement really
+          landed on-chain, and count the payments made to any merchant address. No
+          backend, no wallet connection.
+          <a class="tx-link" href="https://gettollgate.vercel.app" target="_blank" rel="noreferrer">See how Tollgate works</a>.
         </p>
 
         <figure class="specimen" id="specimen" aria-hidden="true">
@@ -48,68 +49,68 @@
             <span class="spec-label">Toll ticket</span>
             <span class="spec-route" data-decrypt="GET /report">GET /report</span>
             <span class="spec-meta" data-decrypt="eip155:688689" data-charset="hex">eip155:688689</span>
-            <span class="spec-meta" data-decrypt="payer 0x7c41 9e2d" data-charset="hex">payer 0x7c41 9e2d</span>
+            <span class="spec-meta" data-decrypt="settled on-chain" data-charset="hex">settled on-chain</span>
           </div>
           <div class="spec-perf"></div>
           <div class="spec-right">
             <span class="spec-no" data-decrypt="No. 000482">No. 000482</span>
             <span class="spec-amount" data-decrypt="0.10">0.10</span>
-            <span class="spec-unit">USDC</span>
+            <span class="spec-unit">token</span>
             <div class="spec-barcode"></div>
           </div>
           <span class="spec-stamp">PAID</span>
         </figure>
-
-        <dl class="totals" aria-label="Reconciliation totals">
-          <div class="total">
-            <dt>Total received</dt>
-            <dd class="figure" id="total-received">0.00</dd>
-            <dd class="unit" id="total-unit">USDC</dd>
-          </div>
-          <div class="total">
-            <dt>Tickets cleared</dt>
-            <dd class="figure" id="paid-count">0</dd>
-          </div>
-          <div class="total">
-            <dt>Duplicates voided</dt>
-            <dd class="figure" id="void-count">0</dd>
-          </div>
-        </dl>
       </header>
 
-      <section class="rolls" aria-live="polite">
-        <div class="rolls-head">
-          <h2>Tickets</h2>
-          <button id="seed" class="ghost" type="button" title="Clear a payment, then replay it and watch the duplicate get voided">
-            Run demo
-          </button>
+      <section class="doc verify" data-no="01">
+        <h2>Verify a settlement</h2>
+        <p>
+          Paste a settlement transaction hash. The ledger reads its receipt straight
+          from the Atlantic RPC and confirms the ERC-20 transfer that paid the gate.
+          Pre-filled with a real Tollgate payment from this network.
+        </p>
+
+        <div class="trk-form">
+          <label class="trk-field trk-grow">
+            <span>Settlement tx hash</span>
+            <input
+              id="vrf-hash"
+              type="text"
+              spellcheck="false"
+              value="0xebde6ded03335f182e45050916a1f1a2e2a8695be6d64fd42e812b0295cf8f4f"
+              placeholder="0x..."
+            />
+          </label>
+          <button id="vrf-btn" class="ghost" type="button">Verify on-chain</button>
         </div>
 
-        <ol id="tickets" class="tickets" aria-label="Ticket rows"></ol>
+        <p class="ledger-note muted" id="vrf-status">Press verify to read this settlement from the chain.</p>
 
-        <div id="empty" class="empty stub" hidden>
-          <div class="perf"></div>
-          <p>No tickets yet.</p>
-          <p class="muted">When a payment clears the gate, its stamped ticket prints here. Press Run demo to watch one clear and a replay get voided.</p>
+        <div id="vrf-result" class="verify-card" hidden>
+          <div class="verify-row">
+            <span class="stamp" id="vrf-stamp">PAID</span>
+            <a class="tx-link mono" id="vrf-explorer" href="#" target="_blank" rel="noreferrer">View on PharosScan</a>
+          </div>
+          <table class="data verify-table">
+            <tbody>
+              <tr><td>Status</td><td class="mono" id="vrf-confirmed">confirmed</td></tr>
+              <tr><td>Block</td><td class="mono" id="vrf-block">-</td></tr>
+              <tr><td>Payer</td><td class="mono" id="vrf-from">-</td></tr>
+              <tr><td>Paid to</td><td class="mono" id="vrf-to">-</td></tr>
+              <tr><td>Amount</td><td class="mono" id="vrf-amount">-</td></tr>
+              <tr><td>Token</td><td class="mono" id="vrf-token">-</td></tr>
+            </tbody>
+          </table>
         </div>
-
-        <div id="skeleton" class="skeleton" aria-hidden="true">
-          <div class="skel-row"></div>
-          <div class="skel-row"></div>
-          <div class="skel-row"></div>
-        </div>
-
-        <p id="error" class="error" role="alert" hidden></p>
-        <p class="ledger-note muted" id="mode-note"></p>
       </section>
 
-      <section class="doc tracker" data-no="01">
-        <h2>Live payment tracker</h2>
+      <section class="doc tracker" data-no="02">
+        <h2>Count a merchant's payments</h2>
         <p>
           Count real payments made to any merchant address, read straight from the
-          chain in your browser. Works on both Pharos networks. The count is kept in
-          this browser and grows as new blocks arrive; scan deeper to reach further
-          back. No backend, no wallet connection, read only.
+          chain. The count is kept in this browser and grows as new blocks arrive;
+          scan deeper to reach further back. Pre-filled with a Tollgate demo merchant
+          and the token it was paid in.
         </p>
 
         <div class="trk-form">
@@ -121,16 +122,16 @@
           </label>
           <label class="trk-field trk-grow">
             <span>Merchant address (payTo)</span>
-            <input id="trk-address" type="text" inputmode="text" spellcheck="false" placeholder="0x..." />
+            <input id="trk-address" type="text" inputmode="text" spellcheck="false" value="0xD8226aCA4A658cea7450ff4B4398f37534488A33" placeholder="0x..." />
           </label>
           <label class="trk-field trk-grow">
             <span>Token</span>
-            <input id="trk-token" type="text" spellcheck="false" placeholder="Token address" />
+            <input id="trk-token" type="text" spellcheck="false" value="0x838800b758277CC111B2d48Ab01e5E164f8E9471" placeholder="Token address" />
           </label>
           <button id="trk-scan" class="ghost trk-scan" type="button">Track payments</button>
         </div>
 
-        <p class="ledger-note muted" id="trk-status">Enter a merchant address to begin.</p>
+        <p class="ledger-note muted" id="trk-status">Press track to count payments to this merchant.</p>
 
         <div id="trk-results" hidden>
           <dl class="totals trk-totals">
@@ -141,7 +142,7 @@
             <div class="total">
               <dt>Total received</dt>
               <dd class="figure" id="trk-total">0.00</dd>
-              <dd class="unit">USDC</dd>
+              <dd class="unit">token</dd>
             </div>
           </dl>
 
@@ -157,169 +158,9 @@
         </div>
       </section>
 
-      <section class="doc" data-no="02">
-        <h2>How the gate works</h2>
-        <ol class="steps">
-          <li>
-            <span class="step-no">01</span>
-            <div>
-              <h3>Ask</h3>
-              <p>A buyer agent requests a protected resource. The server answers HTTP 402 with payment requirements: amount, token, recipient, network.</p>
-            </div>
-          </li>
-          <li>
-            <span class="step-no">02</span>
-            <div>
-              <h3>Pay</h3>
-              <p>The buyer pays in USDC on Pharos Atlantic and retries the request with an X-PAYMENT header carrying the settlement tx hash.</p>
-            </div>
-          </li>
-          <li>
-            <span class="step-no">03</span>
-            <div>
-              <h3>Stamp</h3>
-              <p>Tollgate verifies the transfer on-chain, settles it idempotently, and prints a signed PAID ticket. A replay of the same tx is blocked and stamped VOID, pointing at the original.</p>
-            </div>
-          </li>
-        </ol>
-      </section>
-
-      <section class="doc" data-no="03">
-        <h2>Why this exists</h2>
-        <p>
-          The official Pharos x402 example gets you a demo. Shipping a real paid service
-          runs into four gaps that Pharos documents but does not solve for you. Tollgate
-          closes all four.
-        </p>
-        <div class="gaps">
-          <article class="gap">
-            <h3>No hosted facilitator</h3>
-            <p>Pharos has no hosted verify and settle service; the public facilitator is Base-only. Tollgate bundles a facilitator preconfigured for Atlantic with retry, idempotent settle, and a health probe.</p>
-          </article>
-          <article class="gap">
-            <h3>Idempotency left to you</h3>
-            <p>The docs require that the same on-chain tx is never billed or granted twice, and offer no turnkey solution. Tollgate makes it first class: a persistent dedupe store keyed by tx hash that survives restart.</p>
-          </article>
-          <article class="gap">
-            <h3>Sessions left to you</h3>
-            <p>The docs recommend a short-lived token after payment so you do not re-verify on-chain every request. Tollgate mints a signed session token tied to the receipt.</p>
-          </article>
-          <article class="gap">
-            <h3>Network and token confusion</h3>
-            <p>Two testnets, an internal-looking RPC, and a test USDC flagged as not official. Tollgate defines Atlantic (688689) once, pins the verified endpoints, and probes the token before trusting it.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="doc" data-no="04">
-        <h2>The STEP 0 finding</h2>
-        <p>
-          Before building the payment path, Tollgate probes whether the Atlantic test USDC
-          supports EIP-3009, which the gasless x402 exact scheme depends on. It does not.
-        </p>
-        <table class="data">
-          <thead>
-            <tr><th>Probe</th><th>Result</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Token</td><td class="mono">0xE0BE...4ec8, USD Coin, 6 decimals</td></tr>
-            <tr><td>Proxy (EIP-1967 slots)</td><td>None. Not a proxy</td></tr>
-            <tr><td>DOMAIN_SEPARATOR()</td><td>Reverts</td></tr>
-            <tr><td>transferWithAuthorization in bytecode</td><td>Absent</td></tr>
-            <tr><td>permit (EIP-2612) in bytecode</td><td>Absent</td></tr>
-            <tr><td>transfer, transferFrom, approve</td><td>Present</td></tr>
-          </tbody>
-        </table>
-        <p>
-          Verdict: a plain ERC-20, so the gasless exact scheme cannot settle against it.
-          The payment path is an on-chain transfer the buyer broadcasts, confirmed
-          idempotently by the bundled facilitator on settle. When Pharos ships an
-          EIP-3009 token, only the settle mechanism changes. Reproduce it with
-          <span class="mono">npm run step0</span>.
-        </p>
-      </section>
-
-      <section class="doc" data-no="05">
-        <h2>Reliability model</h2>
-        <ul class="plain-list">
-          <li>Every payment is keyed by its settlement tx hash in an append-only log that survives restart. The first verify grants and prints PAID. Any repeat prints VOID and points at the original.</li>
-          <li>Settlement results are reused by tx hash on retry, never resubmitted.</li>
-          <li>Receipts are HMAC-signed and tamper-evident, anchored to tx hashes, with reconciliation that counts PAID once and VOID never.</li>
-          <li>Safety rails: dry-run mode, per-tx and per-session buyer spend caps, address and amount validation, retry with backoff, and respect for Atlantic limits (500 requests per 5 minutes, 64 pending txs per address).</li>
-          <li>The private key is read only from the environment and redacted from every log and error.</li>
-        </ul>
-      </section>
-
-      <section class="doc" data-no="06">
-        <h2>Tools</h2>
-        <table class="data">
-          <thead>
-            <tr><th>Tool</th><th>Side</th><th>What it does</th></tr>
-          </thead>
-          <tbody>
-            <tr><td class="mono">protect_endpoint</td><td>seller</td><td>Build the x402 paymentMiddleware config to gate one route by price.</td></tr>
-            <tr><td class="mono">verify_payment</td><td>seller</td><td>Idempotently verify an incoming payment and decide the grant. Never bills twice.</td></tr>
-            <tr><td class="mono">issue_access_token</td><td>seller</td><td>Mint a short-lived signed session token after a verified payment.</td></tr>
-            <tr><td class="mono">verify_access_token</td><td>seller</td><td>Check a presented session token: signature, expiry, claims. No on-chain calls.</td></tr>
-            <tr><td class="mono">get_receipt</td><td>seller</td><td>Fetch one signed receipt and confirm its signature.</td></tr>
-            <tr><td class="mono">list_receipts</td><td>seller</td><td>List receipts with filters plus an earnings reconciliation summary.</td></tr>
-            <tr><td class="mono">pay_for_resource</td><td>buyer</td><td>Pay a 402-gated endpoint per call and return the resource plus a receipt.</td></tr>
-            <tr><td class="mono">facilitator_status</td><td>infra</td><td>Health of the bundled Atlantic facilitator and its account.</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="doc" data-no="07">
-        <h2>Quickstart</h2>
-        <p>Requires Node 20 or newer. Runs as an MCP server over stdio by default, or HTTP.</p>
-<pre class="code"><code>npm install
-cp .env.example .env   # set TOLLGATE_SIGNING_SECRET, and a key for paying
-npm run build
-npm start              # MCP over stdio
-
-# Or over HTTP
-TOLLGATE_TRANSPORT=http TOLLGATE_HTTP_PORT=8402 npm start</code></pre>
-        <p>Run the full demo locally: ledger, seller, and a buyer that pays then replays.</p>
-<pre class="code"><code>npm run dashboard                                  # this page, live
-TOLLGATE_PAY_TO=0xYourAddress npm run seller       # a paid endpoint
-TOLLGATE_PRIVATE_KEY=0xFundedKey npm run buyer -- --replay</code></pre>
-        <p>
-          A typical agent flow is two calls: <span class="mono">verify_payment</span> to clear
-          the ticket, then <span class="mono">issue_access_token</span> so the session does not
-          re-verify on-chain every request.
-        </p>
-      </section>
-
-      <section class="doc" data-no="08">
-        <h2>Network facts</h2>
-        <table class="data">
-          <tbody>
-            <tr><td>Network</td><td class="mono">Pharos Atlantic Testnet, chain id 688689 (eip155:688689)</td></tr>
-            <tr><td>RPC</td><td class="mono">https://atlantic.dplabs-internal.com</td></tr>
-            <tr><td>Explorer</td><td><a class="tx-link mono" href="https://atlantic.pharosscan.xyz" target="_blank" rel="noreferrer">atlantic.pharosscan.xyz</a></td></tr>
-            <tr><td>Gas token</td><td class="mono">PHRS, 18 decimals</td></tr>
-            <tr><td>Test USDC</td><td class="mono">0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8 (6 decimals)</td></tr>
-            <tr><td>Limits</td><td class="mono">500 requests per 5 min, 64 pending txs per address</td></tr>
-          </tbody>
-        </table>
-      </section>
-
-      <section class="doc" data-no="09">
-        <h2>Phase 2: a paid data merchant agent</h2>
-        <p>
-          Tollgate is the foundation for an Agent Arena entrant. The agent gates a resource
-          with <span class="mono">protect_endpoint</span>, takes payment through
-          <span class="mono">verify_payment</span> so it is never double-billed under load,
-          hands buyers a session token, and watches its earnings with
-          <span class="mono">list_receipts</span>. Because the skill is two-sided, the same
-          agent pays other merchants with <span class="mono">pay_for_resource</span> within a
-          budget. Every paid interaction pulls two agents through the skill: the buyer and
-          the seller.
-        </p>
-      </section>
-
       <footer class="colophon">
-        <span id="status">Reading the ledger.</span>
+        <span id="status">Read-only ledger on Pharos Atlantic.</span>
+        <a class="tx-link" href="https://gettollgate.vercel.app" target="_blank" rel="noreferrer">Main site</a>
         <a class="tx-link" href="https://github.com/Eienel/tollgate" target="_blank" rel="noreferrer">Source on GitHub</a>
       </footer>
     </main>

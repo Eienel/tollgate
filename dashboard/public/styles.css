@@ -1072,6 +1072,43 @@ body::after {
   margin-top: var(--space-4);
 }
 
+/* Verify a settlement: a result card showing the on-chain read. */
+.verify-card {
+  margin-top: var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: var(--space-5);
+  box-shadow: 0 1px 2px rgba(22, 21, 15, 0.03), 0 6px 18px rgba(22, 21, 15, 0.05);
+}
+
+.verify-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.stamp.press {
+  animation: press 0.5s var(--spring) both;
+}
+
+.verify-table {
+  margin: 0;
+}
+.verify-table td {
+  padding: 6px 0;
+}
+.verify-table td:first-child {
+  color: var(--ink-muted);
+  width: 9rem;
+}
+.verify-table td.mono {
+  word-break: break-all;
+}
+
+
 /* ---------------------------------------------------------------------------
    Interaction taste: tilt sheen, ink-fleck click spark, cursor light. Paper
    and ink only. One green accent. All gated under reduced motion below.

@@ -6,7 +6,7 @@ are what stand between that demo and a service you can actually charge for.
 
 | # | Pharos documents the gap | Tollgate's answer |
 | --- | --- | --- |
-| 1 | **No hosted facilitator.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations) warns it "could become a single point of failure." | A bundled facilitator for both networks, with retry and a `facilitator_status` probe. |
+| 1 | **No hosted facilitator.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations) warns it "could become a single point of failure." | A bundled facilitator for Atlantic, with retry and a `facilitator_status` probe. |
 | 2 | **Idempotency, on you.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations): "the same on-chain transaction is not billed multiple times." | A restart-surviving dedupe keyed by tx hash. Never bills or grants twice. |
 | 3 | **Sessions, on you.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#development-recommendations) recommends "a short-term valid JSON Web Token (JWT)." | `issue_access_token` mints a signed session bound to the receipt. |
 | 4 | **Network confusion.** [Pharos](https://docs.pharos.xyz/developer-guide/x402#skill) flags a test USDC "which is not an official address." | Pins the chain, RPC, and token, and verifies the token in STEP 0 below. |
@@ -98,23 +98,23 @@ TOLLGATE_TRANSPORT=http TOLLGATE_HTTP_PORT=8402 npm start
 # POST JSON-RPC to http://localhost:8402/mcp, health at /healthz
 ```
 
-## Demo: seller, buyer, and the live ledger
+## Demo: seller, buyer, and the on-chain ledger
 
 ```
-# Terminal 1: the demo dashboard (the live receipts ledger)
-npm run dashboard           # http://localhost:8088
-
-# Terminal 2: a paid endpoint built on the skill
+# Terminal 1: a paid endpoint built on the skill
 TOLLGATE_PAY_TO=0xYourMerchantAddress npm run seller
 
-# Terminal 3: a buyer agent that pays per call, then replays to show a block
+# Terminal 2: a buyer agent that pays per call, then replays to show a block
 TOLLGATE_PRIVATE_KEY=0xYourFundedKey npm run buyer -- --replay
 ```
 
-The first claim clears and a PAID stamp presses onto a ticket. The replay sends the
-same payment and the seller blocks it with a VOID stamp. The reconciliation totals
-update, counting the cleared payment once. With no funded wallet, click Run demo on
-the dashboard to seed a PAID and a duplicate VOID and see the same story.
+The first claim clears and prints a PAID receipt with a real settlement tx hash.
+The replay sends the same payment and the seller blocks it with a VOID, pointing
+at the original. The hosted ledger at `tollgate-pharos.vercel.app` is a read-only,
+on-chain tool: paste that settlement hash to verify it landed, or enter the
+merchant address to count every payment it received, both read straight from
+Pharos Atlantic in the browser. Run it locally with `npm run dashboard`
+(`http://localhost:8088`).
 
 ## Environment
 
