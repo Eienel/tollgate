@@ -26,7 +26,7 @@ function ScrollProgress() {
 }
 
 const GAPS = [
-  ["01", "No hosted facilitator", "Pharos runs no verify-and-settle service; the public facilitator is Base only. Tollgate bundles one for Atlantic and Pacific with retry, idempotent settle, and a health probe."],
+  ["01", "No hosted facilitator", "Pharos runs no verify-and-settle service; the public facilitator is Base only. Tollgate bundles one for Atlantic with retry, idempotent settle, and a health probe."],
   ["02", "Idempotency, on you", "The docs demand a payment is never billed or granted twice, with no turnkey answer. Tollgate makes it first class: a persistent dedupe keyed by tx hash that survives restart."],
   ["03", "Sessions, on you", "After payment you should not re-verify on chain every request. Tollgate mints a signed, short-lived session token bound to the receipt."],
   ["04", "Network confusion", "Two testnets, an internal-looking RPC, a test USDC flagged unofficial. Tollgate defines the chain once, pins verified endpoints, and probes the token before trusting it."],
@@ -44,7 +44,7 @@ const TOOLS = [
 ];
 
 const CHIPS = [
-  ["Chain", "eip155:688689 / 1672"],
+  ["Chain", "eip155:688689"],
   ["Settle", "idempotent"],
   ["Receipts", "HMAC-signed"],
   ["Token", "USDC, 6dp"],

@@ -9,9 +9,9 @@ startCommand:
     properties:
       TOLLGATE_NETWORK:
         type: string
-        enum: [atlantic, mainnet]
+        enum: [atlantic]
         default: atlantic
-        description: Pharos network preset. atlantic = testnet 688689, mainnet = Pacific 1672.
+        description: Pharos network preset. atlantic = Atlantic Testnet, chain id 688689.
       TOLLGATE_PRIVATE_KEY:
         type: string
         description: Hex key for paying and settling. Only needed for the buyer side or live settle. Read from env, redacted from logs.
@@ -20,7 +20,7 @@ startCommand:
         description: Address that receives merchant payments. Defaults to the key's address.
       TOLLGATE_USDC_ADDRESS:
         type: string
-        description: Payment token. Defaults to the verified Atlantic test USDC. Required on mainnet.
+        description: Payment token. Defaults to the verified Atlantic test USDC; set it to charge in another ERC-20.
       TOLLGATE_SIGNING_SECRET:
         type: string
         description: HMAC secret for receipts and tokens. Optional; generated and persisted if unset.

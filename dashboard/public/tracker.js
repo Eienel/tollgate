@@ -1,8 +1,8 @@
 // tracker.js
 // A real on-chain payment tracker that runs entirely in the browser. Given a
-// merchant address and a token, it reads ERC-20 Transfer events straight from a
-// Pharos RPC (CORS is open on both Atlantic testnet and Pacific mainnet) and
-// counts the payments that landed. Progress is remembered in localStorage, so
+// merchant address and a token, it reads ERC-20 Transfer events straight from
+// the Pharos Atlantic RPC (CORS is open) and counts the payments that landed.
+// Progress is remembered in localStorage, so
 // the count is cumulative across visits and grows as new blocks arrive, without
 // any backend. Each scan only reads new blocks; "scan deeper" extends the
 // window backward.
@@ -15,14 +15,6 @@ const NETWORKS = {
     explorer: "https://atlantic.pharosscan.xyz",
     defaultToken: "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8",
     testnet: true,
-  },
-  mainnet: {
-    label: "Pacific mainnet",
-    chainId: 1672,
-    rpc: "https://rpc.pharos.xyz",
-    explorer: "https://pharosscan.xyz",
-    defaultToken: "",
-    testnet: false,
   },
 };
 
@@ -226,7 +218,7 @@ async function runScan({ deeper } = {}) {
     return;
   }
   if (!isAddress(token)) {
-    setStatus("Enter a valid token address. Pacific mainnet has no default token.");
+    setStatus("Enter a valid token address.");
     return;
   }
 
@@ -308,7 +300,7 @@ function syncTokenPlaceholder() {
   const net = NETWORKS[els.network.value];
   els.token.placeholder = net.defaultToken
     ? `Default: ${net.defaultToken}`
-    : "Token address (required on mainnet)";
+    : "Token address";
 }
 
 export function initTracker() {

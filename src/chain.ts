@@ -1,8 +1,8 @@
 // chain.ts
 // The Pharos chain Tollgate runs on, defined once with viem and reused
-// everywhere. Holds the network presets (Atlantic testnet and Pacific
-// mainnet), the verified test USDC address, a minimal ERC-20 ABI,
-// retry-with-backoff, a rate-limit and pending-tx budget, and key redaction.
+// everywhere. Holds the Atlantic testnet preset, the verified test USDC
+// address, a minimal ERC-20 ABI, retry-with-backoff, a rate-limit and
+// pending-tx budget, and key redaction.
 
 import {
   createPublicClient,
@@ -17,9 +17,9 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
-// The Pharos networks Tollgate knows. Select with TOLLGATE_NETWORK=atlantic
-// (default) or mainnet; any field can still be overridden by its own env var.
-// Both chain ids and RPCs are verified live (see DECISION.md).
+// The Pharos network Tollgate runs on: Atlantic Testnet, the network the x402
+// skill spec targets. Any field can be overridden by its own env var. The
+// chain id and RPC are verified live (see DECISION.md).
 interface NetworkPreset {
   id: number;
   name: string;
@@ -28,8 +28,7 @@ interface NetworkPreset {
   explorer: string;
   symbol: string;
   testnet: boolean;
-  // Default payment token, where one is known and verified. On mainnet there
-  // is no verified default; set TOLLGATE_USDC_ADDRESS explicitly.
+  // Default payment token, where one is known and verified.
   usdc?: Address;
 }
 
@@ -43,14 +42,6 @@ const PRESETS: Record<string, NetworkPreset> = {
     symbol: "PHRS",
     testnet: true,
     usdc: "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8",
-  },
-  mainnet: {
-    id: 1672,
-    name: "Pharos Pacific Mainnet",
-    rpc: "https://rpc.pharos.xyz",
-    explorer: "https://pharosscan.xyz",
-    symbol: "PROS",
-    testnet: false,
   },
 };
 
@@ -74,8 +65,8 @@ export const WSS_URL = process.env.TOLLGATE_WSS_URL ?? preset.wss;
 export const EXPLORER_URL = process.env.TOLLGATE_EXPLORER_URL ?? preset.explorer;
 
 // The payment token. On Atlantic this defaults to the verified test USDC, a
-// plain ERC-20 with no EIP-3009 (see DECISION.md / npm run step0). On mainnet
-// there is no verified default; the merchant chooses and sets it explicitly.
+// plain ERC-20 with no EIP-3009 (see DECISION.md / npm run step0). A merchant
+// can charge in any ERC-20 by setting TOLLGATE_USDC_ADDRESS explicitly.
 const envToken = process.env.TOLLGATE_USDC_ADDRESS?.trim();
 const resolvedToken = envToken ?? preset.usdc;
 if (!resolvedToken) {

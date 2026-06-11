@@ -1,7 +1,7 @@
 {
   "name": "x402-merchant",
   "version": "0.1.0",
-  "description": "Tollgate: a production-grade x402 merchant layer for Pharos. Turns any AI agent into a reliable paid merchant and a paying buyer, with idempotent verification, verifiable receipts, post-payment sessions, and a bundled facilitator. Atlantic testnet and Pacific mainnet.",
+  "description": "Tollgate: a production-grade x402 merchant layer for Pharos. Turns any AI agent into a reliable paid merchant and a paying buyer, with idempotent verification, verifiable receipts, post-payment sessions, and a bundled facilitator. Runs on Pharos Atlantic Testnet.",
   "keywords": [
     "x402",
     "pharos",

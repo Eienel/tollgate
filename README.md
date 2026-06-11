@@ -14,9 +14,8 @@ are what stand between that demo and a service you can actually charge for.
 Underneath the four answers, Tollgate is a two-sided TypeScript MCP server: an
 agent can sell a service (take payment, issue a session, keep verifiable
 receipts, reconcile earnings) and an agent can buy one (pay per call within a
-budget). Default transport is stdio; HTTP is optional. It runs on both Pharos
-networks: Atlantic testnet (688689) by default, or Pacific mainnet (1672) via
-`TOLLGATE_NETWORK=mainnet`.
+budget). Default transport is stdio; HTTP is optional. It runs on Pharos
+Atlantic Testnet (688689), the network the x402 skill spec targets.
 
 ## STEP 0: the test USDC has no EIP-3009
 
@@ -121,11 +120,11 @@ the dashboard to seed a PAID and a duplicate VOID and see the same story.
 
 | Variable | Meaning | Default |
 | --- | --- | --- |
-| `TOLLGATE_NETWORK` | Preset: `atlantic` (testnet) or `mainnet` (Pacific) | `atlantic` |
-| `TOLLGATE_CHAIN_ID` | Override the preset chain id | preset (688689 / 1672) |
+| `TOLLGATE_NETWORK` | Network preset. Only `atlantic` is supported | `atlantic` |
+| `TOLLGATE_CHAIN_ID` | Override the preset chain id | preset (688689) |
 | `TOLLGATE_RPC_URL` | Override the preset RPC | preset |
 | `TOLLGATE_EXPLORER_URL` | Override the preset explorer | preset |
-| `TOLLGATE_USDC_ADDRESS` | Payment token. Required on mainnet (no default) | Atlantic test USDC |
+| `TOLLGATE_USDC_ADDRESS` | Payment token. Defaults to the Atlantic test USDC; set it to charge in another ERC-20 | Atlantic test USDC |
 | `TOLLGATE_PRIVATE_KEY` | Hex key for paying and settling. Read from env, redacted from logs | none |
 | `TOLLGATE_PAY_TO` | Address that receives merchant payments | the key's address |
 | `TOLLGATE_DATA_DIR` | Where the idempotency log and receipts ledger live | `./.tollgate` |
