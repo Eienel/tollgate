@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { parseEventLogs } from "viem";
 import { CHAIN_ID, USDC_ADDRESS, publicClient, erc20Abi } from "../src/chain.js";
 import { ReceiptStore, verifyReceipt } from "../src/receipts.js";
 
@@ -35,6 +36,31 @@ test("Atlantic chain id is 688689 and token is USDC with 6 decimals", async (t) 
   ]);
   assert.equal(symbol, "USDC");
   assert.equal(decimals, 6);
+});
+
+test("erc20Abi can decode a Transfer event (facilitator verify depends on it)", () => {
+  // Regression: the on-chain verify decodes the Transfer event from this ABI.
+  // If the event is missing, parseEventLogs returns nothing and every real
+  // payment is rejected as "no matching transfer".
+  const from = "0x1111111111111111111111111111111111111111";
+  const to = "0x2222222222222222222222222222222222222222";
+  const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  const pad = (a: string) => "0x" + "0".repeat(24) + a.slice(2);
+  const log = {
+    address: USDC_ADDRESS,
+    topics: [TRANSFER_TOPIC, pad(from), pad(to)] as `0x${string}`[],
+    data: ("0x" + (100000n).toString(16).padStart(64, "0")) as `0x${string}`,
+    blockNumber: 1n,
+    blockHash: ("0x" + "00".repeat(32)) as `0x${string}`,
+    logIndex: 0,
+    transactionHash: ("0x" + "ab".repeat(32)) as `0x${string}`,
+    transactionIndex: 0,
+    removed: false,
+  };
+  const decoded = parseEventLogs({ abi: erc20Abi, eventName: "Transfer", logs: [log] });
+  assert.equal(decoded.length, 1);
+  const args = decoded[0]!.args as { from: string; to: string; value: bigint };
+  assert.equal(args.value, 100000n);
 });
 
 test("a PAID receipt is signed and verifiable; tampering is detected", async () => {

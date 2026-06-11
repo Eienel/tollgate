@@ -5,9 +5,10 @@ import { Decrypt, Magnetic, Tilt, CountUp, Reveal, CustomCursor, useIsTouch, SPR
 const SITE = "https://tollgate-pharos.vercel.app";
 const REPO = "https://github.com/Eienel/tollgate";
 
-// A real Tollgate payment settled on Pharos Atlantic. Set once a funded run
-// produces a hash; the proof panel verifies it live against the public RPC.
-const PROOF_TX = "";
+// A real Tollgate payment settled on Pharos Atlantic, granted once and then
+// blocked on replay by idempotency. The proof panel verifies it live against
+// the public RPC.
+const PROOF_TX = "0xebde6ded03335f182e45050916a1f1a2e2a8695be6d64fd42e812b0295cf8f4f";
 const ATLANTIC_RPC = "https://atlantic.dplabs-internal.com";
 const PHAROSSCAN = "https://atlantic.pharosscan.xyz";
 
