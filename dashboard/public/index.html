@@ -36,10 +36,7 @@
         <p class="display">Read straight from the chain.<br /><span class="display-muted">Verify a settlement. Count what a merchant earned.</span></p>
 
         <p class="lede">
-          This is the ledger, not the pitch. It does two things, both against live
-          Pharos Atlantic in your browser: confirm that a Tollgate settlement really
-          landed on-chain, and count the payments made to any merchant address. No
-          backend, no wallet connection.
+          Read-only, no wallet.
           <a class="tx-link" href="https://gettollgate.vercel.app" target="_blank" rel="noreferrer">See how Tollgate works</a>.
         </p>
 
@@ -64,11 +61,7 @@
 
       <section class="doc verify" data-no="01">
         <h2>Verify a settlement</h2>
-        <p>
-          Paste a settlement transaction hash. The ledger reads its receipt straight
-          from the Atlantic RPC and confirms the ERC-20 transfer that paid the gate.
-          Pre-filled with a real Tollgate payment from this network.
-        </p>
+        <p>Paste a tx hash. Confirms the on-chain transfer that paid the gate.</p>
 
         <div class="trk-form">
           <label class="trk-field trk-grow">
@@ -106,12 +99,7 @@
 
       <section class="doc tracker" data-no="02">
         <h2>Count a merchant's payments</h2>
-        <p>
-          Count real payments made to any merchant address, read straight from the
-          chain. The count is kept in this browser and grows as new blocks arrive;
-          scan deeper to reach further back. Pre-filled with a Tollgate demo merchant
-          and the token it was paid in.
-        </p>
+        <p>Payments to any merchant address, counted from the chain.</p>
 
         <div class="trk-form">
           <label class="trk-field">

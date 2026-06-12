@@ -144,7 +144,7 @@ async function verify() {
     }
     v.result.hidden = false;
     v.status.textContent = ok
-      ? "Confirmed on-chain. This is a real settlement, read live from the Atlantic RPC."
+      ? "Confirmed on-chain, read live from the Atlantic RPC."
       : "This transaction reverted on-chain.";
   } catch (err) {
     v.status.textContent = "RPC unreachable. Open the transaction on PharosScan instead.";
