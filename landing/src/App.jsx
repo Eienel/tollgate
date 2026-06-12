@@ -4,6 +4,7 @@ import { Decrypt, Magnetic, Tilt, CountUp, Reveal, CustomCursor, useIsTouch, SPR
 
 const SITE = "https://tollgate-pharos.vercel.app";
 const REPO = "https://github.com/Eienel/tollgate";
+const NPM = "https://www.npmjs.com/package/x402-merchant";
 
 // A real Tollgate payment settled on Pharos Atlantic, granted once and then
 // blocked on replay by idempotency. The proof panel verifies it live against
@@ -522,9 +523,17 @@ function Start() {
           <p>Zero-config by default. A signing secret is generated and persisted on first run. A key is only needed to pay or settle.</p>
         </div>
         <Reveal>
-          <div className="code" style={{ marginBottom: 16 }}>
+          <div className="code" style={{ marginBottom: 10 }}>
             <div><span className="m">npm install x402-merchant</span></div>
           </div>
+        </Reveal>
+        <Reveal>
+          <p style={{ marginBottom: 16, fontSize: 13 }}>
+            <a className="g" href={NPM} target="_blank" rel="noreferrer" style={{ textDecoration: "underline", textUnderlineOffset: 3 }}>
+              View the package on npm
+            </a>
+            <span style={{ color: "var(--muted)" }}> · published as x402-merchant</span>
+          </p>
         </Reveal>
         <Reveal>
           <div className="code">
@@ -555,6 +564,7 @@ function Footer() {
         </div>
         <div className="links">
           <a href={REPO} target="_blank" rel="noreferrer">GitHub</a>
+          <a href={NPM} target="_blank" rel="noreferrer">npm</a>
           <a href={SITE} target="_blank" rel="noreferrer">Live ledger</a>
           <a href="#start">Install</a>
         </div>

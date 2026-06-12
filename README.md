@@ -1,5 +1,9 @@
 # Tollgate (x402-merchant)
 
+[![npm version](https://img.shields.io/npm/v/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
+[![npm downloads](https://img.shields.io/npm/dm/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
+[![license](https://img.shields.io/npm/l/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
+
 **Tollgate closes four gaps in Pharos's x402 spec that the docs acknowledge but
 leave for developers to solve.** The official example gets you a demo; the gaps
 are what stand between that demo and a service you can actually charge for.
