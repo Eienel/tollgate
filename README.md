@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/npm/l/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
 
 > **Pharos Skill-to-Agent Hackathon, Phase 1 — the x402 Payment Skill.**
-> Live demo: **[gettollgate.vercel.app](https://gettollgate.vercel.app)** · On-chain ledger: **[tollgate-pharos.vercel.app](https://tollgate-pharos.vercel.app)** · Package: **[npm i x402-merchant](https://www.npmjs.com/package/x402-merchant)**
+> What is Tollgate: **[gettollgate.vercel.app](https://gettollgate.vercel.app)** · On-chain ledger: **[tollgate-pharos.vercel.app](https://tollgate-pharos.vercel.app)** · Package: **[npm i x402-merchant](https://www.npmjs.com/package/x402-merchant)**
 
 **Tollgate closes four gaps in Pharos's x402 spec that the docs acknowledge but
 leave for developers to solve.** The official example gets you a demo; the gaps
