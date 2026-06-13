@@ -55,14 +55,24 @@ Buyer side:
 Infra:
 - facilitator_status: health of the bundled Atlantic facilitator and its account.
 
-## Example
+## How an agent uses it
+
+Seller side, two calls per paid request:
 
 ```
-# 1. A buyer paid 0.10 USDC. Verify it once; a repeat is blocked.
+# 1. A buyer paid 0.10 USDC. Verify it once; a repeat of the same tx is blocked.
 verify_payment({ priceUsdc: "0.10", resource: "GET /report", payTo: "0xMerchant", paymentHeader: "<base64 X-PAYMENT>" })
 # -> { grant: true, receipt: { id: "rcpt_...", status: "PAID", txHash: "0x..." } }
+# A replay of the same payment -> { grant: false, reason: "duplicate ...", duplicateOf: "rcpt_..." }
 
 # 2. Mint a session so the agent does not re-verify on chain every request.
 issue_access_token({ receiptId: "rcpt_..." })
 # -> { token: "<jwt>", expiresAt: "..." }
+```
+
+Buyer side, one call to pay a 402-gated endpoint within a budget:
+
+```
+pay_for_resource({ url: "https://api.example/report" })
+# -> { paid: true, settlementTxHash: "0x...", resource: { ... }, receipt: { ... } }
 ```
