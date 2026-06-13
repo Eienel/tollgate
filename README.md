@@ -1,7 +1,6 @@
 # Tollgate (x402-merchant)
 
 [![npm version](https://img.shields.io/npm/v/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
-[![npm downloads](https://img.shields.io/npm/dm/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
 [![license](https://img.shields.io/npm/l/x402-merchant.svg)](https://www.npmjs.com/package/x402-merchant)
 
 > **Pharos Skill-to-Agent Hackathon, Phase 1 — the x402 Payment Skill.**
